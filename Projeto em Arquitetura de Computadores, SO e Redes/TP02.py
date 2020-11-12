@@ -37,56 +37,32 @@ t1.fill(cinza)
 t2.fill(cinza)
 
 
-def desenha_barras(secao, variavel, texto, pct):
-    tela.blit(secao, (0, 0))
+def desenha_barras(secao, tam_secao, variavel, texto):
+    tela.blit(secao, (0, tam_secao))
     larg = largura_tela - 2 * 20
     pygame.draw.rect(secao, azul, (40, 50, larg-10, 10))
     larg = larg * variavel / 100
     pygame.draw.rect(secao, vermelho, (40, 50, larg, 10))
     tela.blit(secao, (0, 0))
     texto_barra = texto
-    texto_uso = str(pct) + "%"
+    texto_uso = str(variavel) + "%"
     text = font.render(texto_barra, 1, escuro)
     uso = font2.render(texto_uso, 1, escuro)
     secao.fill(cinza)
     secao.blit(text, (20, 5))
     secao.blit(uso, (5, 45))
 
+
 # função de uso da memória
-def mostra_uso_memoria():
-    tela.blit(t1, (0, 0))
+def uso_memoria():
     mem = psutil.virtual_memory()
-    larg = largura_tela - 2*20
-    pygame.draw.rect(t1, azul, (40, 50, larg-10, 10))
-    larg = larg*mem.percent/100
-    pygame.draw.rect(t1, vermelho, (40, 50, larg, 10))
-    tela.blit(t1, (0, 0))
-    texto_barra = "Uso de Memória"
-    texto_uso = str(mem.percent) + "%"
-    text = font.render(texto_barra, 1, escuro)
-    uso = font2.render(texto_uso, 1, escuro)
-    t1.fill(cinza)
-    t1.blit(text, (20, 5))
-    t1.blit(uso, (5, 45))
+    return mem.percent
 
 
 # função de uso do processador
-def mostra_uso_cpu():
-    tela.blit(t2, (0, altura_tela / 3))
+def uso_cpu():
     capacidade = psutil.cpu_percent(interval=0)
-    larg = largura_tela - 2*20
-    pygame.draw.rect(t2, vermelho, (40, 50, larg-10, 10))
-    larg = larg*capacidade/100
-    pygame.draw.rect(t2, azul, (40, 50, larg, 10))
-    tela.blit(t2, (0, altura_tela / 3))
-    texto_barra = "Uso do Processador"
-    texto_uso = str(capacidade) + "%"
-    text = font.render(texto_barra, 1, escuro)
-    uso = font2.render(texto_uso, 1, escuro)
-    t2.fill(cinza)
-    t2.blit(text, (20, 5))
-    t2.blit(uso, (5, 45))
-
+    return capacidade
 
 
 # Cria relógio
@@ -99,8 +75,7 @@ while not terminou:
         if event.type == pygame.QUIT:
             terminou = True
     if cont == 60:
-        mostra_uso_memoria()
-        mostra_uso_cpu()
+        desenha_barras(t1, 0, uso_memoria(), "Uso de Memória")
         cont = 0
     # Atualiza o desenho na tela
     pygame.display.update()
