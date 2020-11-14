@@ -23,6 +23,15 @@ conta_clocks = 0
 pontos = 0
 # variavel para contar qtos segundos passaram
 conta_segundos = 0
+
+#Para imprimir o texto com o tempo e a pontuação corrente
+def mostra_tempo(tempo, pontos):
+    font = pygame.font.Font(None, 24)
+    text = font.render("Tempo: " + str(tempo) + "s | Pontuação: " + str(pontos), 1, white)
+    textpos = text.get_rect(centerx=tela.get_width()//2)
+    tela.blit(text, textpos)
+
+
 terminou = False
 while not terminou:
     # atualiza a tela
@@ -38,10 +47,7 @@ while not terminou:
 
     tela.fill(darkBlue)
 
-    # Desenha um retângulo não preenchido com linha
-    pygame.draw.rect(tela, white, (10, 10, 200, 100), 3)
-    # Desenha um retângulo preenchido
-    pygame.draw.rect(tela, pink, (400, 300, 50, 50))
+    mostra_tempo(conta_segundos, pontos)
 
     # atualiza o desenho na tela
     pygame.display.update()
