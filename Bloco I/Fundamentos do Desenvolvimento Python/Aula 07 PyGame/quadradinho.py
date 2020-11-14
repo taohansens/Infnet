@@ -16,7 +16,6 @@ cores = [lightBlue, blue, darkBlue, white, pink]
 clock = pygame.time.Clock()
 tela = pygame.display.set_mode((largura_tela, altura_tela))
 
-
 # Variavel para contar quantas esperas de 60Hz ou 0,016s
 conta_clocks = 0
 # conta quantos quadradinhos clicou
@@ -24,11 +23,12 @@ pontos = 0
 # variavel para contar qtos segundos passaram
 conta_segundos = 10
 
-#Para imprimir o texto com o tempo e a pontuação corrente
+
+# Para imprimir o texto com o tempo e a pontuação corrente
 def mostra_tempo(tempo, pontos):
     font = pygame.font.Font(None, 24)
     text = font.render("Tempo: " + str(tempo) + "s | Pontuação: " + str(pontos), 1, white)
-    textpos = text.get_rect(centerx=tela.get_width()//2)
+    textpos = text.get_rect(centerx=tela.get_width() // 2)
     tela.blit(text, textpos)
 
 
@@ -48,7 +48,6 @@ while not terminou:
             tela.fill(cores[random.randint(0, 4)])
         else:
             terminou = True
-
 
     mostra_tempo(conta_segundos, pontos)
 
