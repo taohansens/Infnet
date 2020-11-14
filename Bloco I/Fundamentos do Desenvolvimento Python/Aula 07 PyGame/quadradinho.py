@@ -1,4 +1,4 @@
-import pygame
+import pygame, random
 
 pygame.init()
 largura_tela = 800
@@ -22,7 +22,7 @@ conta_clocks = 0
 # conta quantos quadradinhos clicou
 pontos = 0
 # variavel para contar qtos segundos passaram
-conta_segundos = 0
+conta_segundos = 10
 
 #Para imprimir o texto com o tempo e a pontuação corrente
 def mostra_tempo(tempo, pontos):
@@ -42,10 +42,13 @@ while not terminou:
             terminou = True
     conta_clocks += 1
     if conta_clocks == 60:
-        conta_segundos += 1
-        conta_clocks = 0
+        if conta_segundos > 0:
+            conta_segundos -= 1
+            conta_clocks = 0
+            tela.fill(cores[random.randint(0, 4)])
+        else:
+            terminou = True
 
-    tela.fill(darkBlue)
 
     mostra_tempo(conta_segundos, pontos)
 
