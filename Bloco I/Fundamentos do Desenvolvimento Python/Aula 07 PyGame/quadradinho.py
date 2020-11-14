@@ -1,8 +1,8 @@
 import pygame, random
+# implementando tupla nomeada
+from collections import namedtuple
 
-pygame.init()
-largura_tela = 800
-altura_tela = 600
+Cor = namedtuple('Cor', ['r', 'g', 'b'])
 
 # cores
 lightBlue = (11, 158, 217)
@@ -13,36 +13,54 @@ black = (0, 0, 0)
 pink = (242, 92, 162)
 cores = [lightBlue, blue, darkBlue, white, pink]
 
+pygame.init()
+largura_tela = 800
+altura_tela = 600
 clock = pygame.time.Clock()
 tela = pygame.display.set_mode((largura_tela, altura_tela))
 
 # Variavel para contar quantas esperas de 60Hz ou 0,016s
 conta_clocks = 0
-# conta quantos quadradinhos clicou
+# conta pontuação
 pontos = 0
-# variavel para contar qtos segundos passaram
-conta_segundos = 5
+# variavel para contar qtos segundos faltam
+conta_segundos = 11
 
 
-# Para imprimir o texto com o tempo e a pontuação corrente
-def mostra_tempo(tempo, pontos):
+# classe Quadradinho
+class Quadradinho:
+    def __init__(self):
+        self.largura = 20
+        self.altura = 20
+        self.x, self.y = gera_pos_aleatoria()
+        self.area = pygame.Rect(self.x, self.y, self.largura, self.altura)
+        self.cor = gera_cor_aleatoria()
+
+    def desenha(self, tela):
+        pygame.draw.rect(tela, self.cor, self.area)
+
+
+# Para imprimir o texto com o tempo e a pontuação atual
+def mostra_placar(tempo, pts):
     font = pygame.font.Font(None, 24)
-    text = font.render("Tempo: " + str(tempo) + "s | Pontuação: " + str(pontos), 1, white)
+    text = font.render("Tempo restante: " + str(tempo) + "s | Pontuação: " + str(pts), True, white)
     textpos = text.get_rect(centerx=tela.get_width() // 2)
     tela.blit(text, textpos)
 
 
 # Cria tupla RGB aleatória
 def gera_cor_aleatoria():
-    return random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)
+    # usando namedTuple
+    cor = Cor(r=random.randint(0, 255), g=random.randint(0, 255), b=random.randint(0, 255))
+    return cor
 
 
 # Mostra pontuação final ao encerrar o jogo
 def mostra_pontuacao_final(tela, pontos):
-    tela.fill(black) # Limpa tela
+    tela.fill(black)  # Limpa tela
     font = pygame.font.Font(None, 36)
-    text = font.render("Pontuação: " + str(pontos) + " quadradinhos", 1, white)
-    textpos = text.get_rect(center=(tela.get_width()/2, tela.get_height()/2))
+    text = font.render("Pontuação final: " + str(pontos) + " pontos", 1, white)
+    textpos = text.get_rect(center=(tela.get_width() / 2, tela.get_height() / 2))
     tela.blit(text, textpos)
 
 
@@ -62,28 +80,29 @@ while not terminou:
             pos = pygame.mouse.get_pos()
             # Checa se foi clicado em algum quadrado
             for q in lista:
-                if q.collidepoint(pos):
+                if q.area.collidepoint(pos):
                     lista.remove(q)
-                    pontos = pontos + 1
-
+                    if q.cor.r < 100 and q.cor.g < 100 and q.cor.b > 175:
+                        pontos += 2
+                    else:
+                        pontos += 1
         if event.type == pygame.QUIT:
             terminou = True
     conta_clocks += 1
+
     if conta_clocks == 60:
         if conta_segundos > 0:
-            # Mostra tempo restante na tela com a pontuação
-            mostra_tempo(conta_segundos, pontos)
-
             conta_segundos -= 1
             conta_clocks = 0
             tela.fill(black)
             lista = []
+            mostra_placar(conta_segundos, pontos)
             # cria 20 quadradinhos a cada segundo
             for quadradinho in range(0, 20):
-                x, y = gera_pos_aleatoria()
-                q = pygame.Rect(x, y, 20, 20)
-                pygame.draw.rect(tela, gera_cor_aleatoria(), q)
+                q = Quadradinho()
+                q.desenha(tela)
                 lista.append(q)
+
         else:
             # fim da partida, mostra pontuação
             mostra_pontuacao_final(tela, pontos)
