@@ -2,7 +2,7 @@
 Q.11. Usando a biblioteca Pygame, escreva um programa que possui uma função que desenha um círculo azul de 100 px de
 diâmetro no centro da tela que se move da esquerda para a direita. Sempre que chegar na extremidade direita, o círculo
 deve voltar à extremidade esquerda, retomando o movimento da esquerda para a direita. (código e printscreen)
-## PrintScreen armazenado em ./Q10 (quadrado_vermelho_mov).jpg após realizar movimentação.
+## Animação armazenada em ./Q11 (circulo_mov_tela).gif
 """
 
 import pygame
