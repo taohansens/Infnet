@@ -1,6 +1,7 @@
 """
 Q10. Usando a biblioteca Pygame, escreva um programa que possui uma função que desenha um quadrado vermelho de 100 px de lado no centro da tela.
 O quadrado deve ser capaz de se movimentar vertical e horizontalmente através de teclas do computador. Pode ser ‘a’,’s’,’d’,’w’ ou as setas do teclado. (código e printscreen)
+## PrintScreen armazenado em ./Q10 (quadrado_vermelho_mov).jpg após realizar movimentação.
 """
 import pygame
 
@@ -23,8 +24,8 @@ def desenha_quadrado_vermelho(x, y):
 
 
 terminou = False
-
-desenha_quadrado_vermelho(largura_tela/2 - 50, altura_tela/2 - 50)
+posicao_atual = [largura_tela/2 - 50, altura_tela/2 - 50]
+desenha_quadrado_vermelho(*posicao_atual)
 
 while not terminou:
     # atualiza a tela
@@ -36,17 +37,14 @@ while not terminou:
         # Verificar eventos do teclado.
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_DOWN or event.key == pygame.K_s:
-                print("Move Baixo")
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_UP or event.key == pygame.K_w:
-                    print("Move Cima")
-            if event.type == pygame.KEYDOWN or event.key == pygame.K_d:
-                if event.key == pygame.K_RIGHT:
-                    print("Move Direita")
-            if event.type == pygame.KEYDOWN or event.key == pygame.K_a:
-                if event.key == pygame.K_LEFT:
-                    print("Move Esquerda")
-
+                posicao_atual[1] += 5
+            if event.key == pygame.K_UP or event.key == pygame.K_w:
+                posicao_atual[1] -= 5
+            if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
+                posicao_atual[0] += 5
+            if event.key == pygame.K_LEFT or event.key == pygame.K_a:
+                posicao_atual[0] -= 5
+        desenha_quadrado_vermelho(*posicao_atual)
 # finaliza a janela do jogo
 pygame.display.quit()
 # finaliza o pygame
