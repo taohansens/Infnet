@@ -106,6 +106,10 @@ def main():
                 pygame.display.quit()
                 pygame.quit()
                 sys.exit()
+            elif event.type == MOUSEMOTION:
+                pygame.mouse.set_visible(0)
+                mouseX, mouseY = event.pos
+                paleta1.y = mouseY
 
         desenha_arena()
         desenha_paleta(paleta1)
