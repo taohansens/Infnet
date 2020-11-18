@@ -8,7 +8,7 @@ from pygame.locals import *
 
 # CONSTANTES
 # FPS
-FPS = 60
+FPS = 120
 
 # DISPLAY
 LARGURA_TELA = 800
@@ -50,16 +50,21 @@ def desenha_bola(bola):
     pygame.draw.rect(DISPLAYSURF, BRANCO, bola)
 
 
-# Altera posição da bola
-bolaDirX = -1
-bolaDirY = -1
-
-
 # Função para atualizar posição da bola
 def movimento_bola(bola, eixo_x, eixo_y):
     bola.x += eixo_x
     bola.y += eixo_y
     return bola
+
+
+# Verifica por colisão com as bordas
+# Retorna uma nova posição caso exista colisão
+def verifica_colisao(bola, bolaDirX, bolaDirY):
+    if bola.top == LARGURA_LINHA or bola.bottom == (ALTURA_TELA - LARGURA_LINHA):
+        bolaDirY = bolaDirY * -1
+    if bola.left == LARGURA_LINHA or bola.right == (LARGURA_TELA - LARGURA_LINHA):
+        bolaDirX = bolaDirX * -1
+    return bolaDirX, bolaDirY
 
 
 def main():
@@ -77,6 +82,10 @@ def main():
     bolaY = ALTURA_TELA // 2 - LARGURA_LINHA // 2
     jogadorUm_posicao = (ALTURA_TELA - PALETA_TAMANHO) // 2
     jogadorDois_posicao = (ALTURA_TELA - PALETA_TAMANHO) // 2
+
+    # Altera posição da bola
+    bolaDirX = -1
+    bolaDirY = -1
 
     # Criando os retangulos para a bola e paletas.
     paleta1 = pygame.Rect(PALETAOFFSET, jogadorUm_posicao, LARGURA_LINHA, PALETA_TAMANHO)
@@ -103,6 +112,7 @@ def main():
         desenha_paleta(paleta2)
         desenha_bola(bola)
         bola = movimento_bola(bola, bolaDirX, bolaDirY)
+        bolaDirX, bolaDirY = verifica_colisao(bola, bolaDirX, bolaDirY)
         pygame.display.update()
         FPSCLOCK.tick(FPS)
 
