@@ -6,9 +6,15 @@ Tal modificação consiste em incluir o aumento da velocidade da bola. O aumento
 import pygame, sys
 from pygame.locals import *
 
+# Provável Menu
+# SE jogador == 0, será bot x bot.
+# SE jogador == 1, será player x bot.
+# SE jogador == 2, player x player.
+JOGADOR = 2
+
 # CONSTANTES
 # FPS
-FPS = 120
+FPS = 300
 
 # DISPLAY
 LARGURA_TELA = 800
@@ -87,6 +93,28 @@ def paleta_bot(bola, bolaDirX, paleta2):
     return paleta2
 
 
+
+def paleta_double_bot(bola, bolaDirX, paleta1, paleta2):
+    # Movimentar a paleta quando a bola vem em direção da paleta
+    if bolaDirX == 1:
+        if paleta2.centery < bola.centery:
+            paleta2.y += 1
+        else:
+            paleta2.y -= 1
+    if bolaDirX == -1:
+        if paleta1.centery < bola.centery:
+            paleta1.y += 1
+        else:
+            paleta1.y -= 1
+    return paleta1, paleta2
+
+
+# Verifica se um jogador fez ponto e retorna o novo valor do placar
+def verifica_placar(paleta1, bola, placar, bolaDirX):
+    if bola.left == LARGURA_LINHA:
+        return 0
+
+
 def main():
     pygame.init()
     global DISPLAYSURF
@@ -102,6 +130,10 @@ def main():
     bolaY = ALTURA_TELA // 2 - LARGURA_LINHA // 2
     jogadorUm_posicao = (ALTURA_TELA - PALETA_TAMANHO) // 2
     jogadorDois_posicao = (ALTURA_TELA - PALETA_TAMANHO) // 2
+
+    # Placar
+    placar_player = 0
+    placar_bot = 0
 
     # Altera posição da bola
     bolaDirX = -1
@@ -126,10 +158,19 @@ def main():
                 pygame.display.quit()
                 pygame.quit()
                 sys.exit()
-            elif event.type == MOUSEMOTION:
-                pygame.mouse.set_visible(0)
-                mouseX, mouseY = event.pos
-                paleta1.y = mouseY
+            elif JOGADOR == 1 or JOGADOR == 2:
+                if event.type == MOUSEMOTION:
+                    mouseX, mouseY = event.pos
+                    # Se apenas um jogador, controlará a paleta esquerda;
+                    if JOGADOR == 1:
+                        paleta1.y = mouseY
+                    # Controlar as duas paletas, a depender da posição do mouse na mesa.
+                    # Se estiver mais para esquerda, controlará a paleta esquerda, se não, a paleta direita.
+                    if JOGADOR == 2:
+                        if mouseX < LARGURA_TELA/2:
+                            paleta1.y = mouseY
+                        if mouseX > LARGURA_TELA / 2:
+                            paleta2.y = mouseY
 
         desenha_arena()
         desenha_paleta(paleta1)
@@ -137,9 +178,12 @@ def main():
         desenha_bola(bola)
         bola = movimento_bola(bola, bolaDirX, bolaDirY)
         bolaDirX, bolaDirY = verifica_colisao(bola, bolaDirX, bolaDirY)
-        paleta2 = paleta_bot(bola, bolaDirX, paleta2)
         bolaDirX = bolaDirX * verifica_colisao_paletas(bola, paleta1, paleta2, bolaDirX)
 
+        if JOGADOR == 0:
+            paleta1, paleta2 = paleta_double_bot(bola, bolaDirX, paleta1, paleta2)
+        if JOGADOR == 1:
+            paleta2 = paleta_bot(bola, bolaDirX, paleta2)
         pygame.display.update()
         FPSCLOCK.tick(FPS)
 
