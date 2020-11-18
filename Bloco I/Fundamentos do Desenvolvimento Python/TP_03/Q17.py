@@ -110,15 +110,71 @@ def paleta_double_bot(bola, bolaDirX, paleta1, paleta2):
 
 
 # Verifica se um jogador fez ponto e retorna o novo valor do placar
-def verifica_placar(paleta1, bola, placar, bolaDirX):
-    if bola.left == LARGURA_LINHA:
-        return 0
+def verifica_placar(paleta1, paleta2, bola, placar_left, placar_right, bolaDirX):
+    if JOGADOR == 1:
+        if bola.left == LARGURA_LINHA:
+            return 0
+        elif bolaDirX == 1 and paleta1.right == bola.left and paleta1.top < bola.top and paleta1.bottom > bola.bottom:
+            placar_left += 1
+            return placar_left
+        elif bola.right == LARGURA_TELA - LARGURA_LINHA:
+            placar_left += 10
+            return placar_left
+        else:
+            return placar_left
 
+    if JOGADOR == 0 or JOGADOR == 2:
+        # Se a bola passar da paleta esquerda, zera seu placar e soma 10 ao adversario.
+        if bola.left == LARGURA_LINHA:
+            placar_left = 0
+            placar_right += 10
+            return placar_left, placar_right
+
+        # Se a bola passar da paleta direita, zera seu placar.
+        if bola.right == LARGURA_TELA - LARGURA_LINHA:
+            placar_right = 0
+            placar_left += 10
+            return placar_left, placar_right
+
+        # Se a bola encostar na paleta do lado esquerdo, soma +1 ponto.
+        elif bolaDirX == 1 and paleta1.right == bola.left and paleta1.top < bola.top and paleta1.bottom > bola.bottom:
+            placar_left += 1
+            return placar_left, placar_right
+
+        # Se a bola encostar na paleta do lado direito, soma +1 ponto.
+        elif bolaDirX == -1 and paleta2.left == bola.right and paleta2.top < bola.top and paleta2.bottom > bola.bottom:
+            placar_right += 1
+            return placar_left, placar_right
+
+        # Bola no meio da partida.
+        else:
+            return placar_left, placar_right
+
+
+# Desenha o placar na tela
+def desenha_placar(placar_left, placar_right):
+    if JOGADOR == 1:
+        resultadoSurf = BASICFONT.render('{}: {}'.format("PONTUAÇÃO", placar_left), True, BRANCO)
+        resultadoRect = resultadoSurf.get_rect()
+        resultadoRect.topleft = (LARGURA_TELA - 150, 25)
+        DISPLAYSURF.blit(resultadoSurf, resultadoRect)
+    if JOGADOR == 0 or JOGADOR == 2:
+        resultadoSurf1 = BASICFONT.render('{}: {}'.format("PLAYER 1", placar_left), True, BRANCO)
+        resultadoSurf2 = BASICFONT.render('{}: {}'.format("PLAYER 2", placar_right), True, BRANCO)
+        resultadoRect1 = resultadoSurf1.get_rect()
+        resultadoRect2 = resultadoSurf2.get_rect()
+        resultadoRect1.topleft = (LARGURA_TELA - 150, 25)
+        resultadoRect2.topleft = (LARGURA_TELA - 400, 25)
+        DISPLAYSURF.blit(resultadoSurf1, resultadoRect1)
+        DISPLAYSURF.blit(resultadoSurf2, resultadoRect2)
 
 def main():
     pygame.init()
     global DISPLAYSURF
-
+    # Informações sobre a fonte do placar
+    global BASICFONT, BASICFONTSIZE
+    BASICFONTSIZE = 20
+    BASICFONT = pygame.font.Font('freesansbold.ttf', BASICFONTSIZE)
     # Clock
     FPSCLOCK = pygame.time.Clock()
     # Display
@@ -132,8 +188,8 @@ def main():
     jogadorDois_posicao = (ALTURA_TELA - PALETA_TAMANHO) // 2
 
     # Placar
-    placar_player = 0
-    placar_bot = 0
+    placar_left = 0
+    placar_right = 0
 
     # Altera posição da bola
     bolaDirX = -1
@@ -184,6 +240,9 @@ def main():
             paleta1, paleta2 = paleta_double_bot(bola, bolaDirX, paleta1, paleta2)
         if JOGADOR == 1:
             paleta2 = paleta_bot(bola, bolaDirX, paleta2)
+
+        placar_left, placar_right = verifica_placar(paleta1, paleta2, bola, placar_left, placar_right, bolaDirX)
+        #print("LEFT: {} RIGHT: {}".format(placar_left, placar_right))
         pygame.display.update()
         FPSCLOCK.tick(FPS)
 
