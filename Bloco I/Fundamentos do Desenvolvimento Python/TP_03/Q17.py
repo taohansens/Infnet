@@ -1,6 +1,8 @@
 """
+PONG:
 Usando a biblioteca Pygame, escreva um programa que implemente o jogo “Pong” (visto no curso), com uma modificação.
 Tal modificação consiste em incluir o aumento da velocidade da bola. O aumento será feito de maneira gradual, isto é, cada 10 vezes que a bola bater na paleta do jogador1 a velocidade aumenta em 1. (código e printscreen)
+[x] + várias modificações.
 """
 
 import pygame, sys
@@ -10,11 +12,11 @@ from pygame.locals import *
 # SE jogador == 0, será bot x bot.
 # SE jogador == 1, será player x bot.
 # SE jogador == 2, player x player.
-JOGADOR = 2
+JOGADOR = 0
 
 # CONSTANTES
 # FPS
-FPS = 300
+FPS = 60
 
 # DISPLAY
 LARGURA_TELA = 800
@@ -36,7 +38,8 @@ def desenha_arena():
     # Desenha a quadra
     pygame.draw.rect(DISPLAYSURF, BRANCO, ((0, 0), (LARGURA_TELA, ALTURA_TELA)), LARGURA_LINHA * 2)
     # Desenha a linha no centro
-    pygame.draw.line(DISPLAYSURF, BRANCO, ((LARGURA_TELA // 2), 0), ((LARGURA_TELA // 2), ALTURA_TELA), (LARGURA_LINHA // 4))
+    pygame.draw.line(DISPLAYSURF, BRANCO, ((LARGURA_TELA // 2), 0), ((LARGURA_TELA // 2), ALTURA_TELA),
+                     (LARGURA_LINHA // 4))
 
 
 # Função para desenhar a paleta
@@ -89,9 +92,8 @@ def paleta_bot(bola, bolaDirX, paleta2):
         if paleta2.centery < bola.centery:
             paleta2.y += 1
         else:
-            paleta2.y -=1
+            paleta2.y -= 1
     return paleta2
-
 
 
 def paleta_double_bot(bola, bolaDirX, paleta1, paleta2):
@@ -154,27 +156,28 @@ def verifica_placar(paleta1, paleta2, bola, placar_left, placar_right, bolaDirX)
 # Desenha o placar na tela
 def desenha_placar(placar_left, placar_right):
     if JOGADOR == 1:
-        resultadoSurf = BASICFONT.render('{}: {}'.format("PONTUAÇÃO", placar_left), True, BRANCO)
+        resultadoSurf = BASICFONT.render('{}'.format(placar_left), True, BRANCO)
         resultadoRect = resultadoSurf.get_rect()
-        resultadoRect.topleft = (LARGURA_TELA - 150, 25)
+        resultadoRect.topleft = (LARGURA_TELA - 480, 25)
         DISPLAYSURF.blit(resultadoSurf, resultadoRect)
     if JOGADOR == 0 or JOGADOR == 2:
-        resultadoSurf1 = BASICFONT.render('{}: {}'.format("PLAYER 1", placar_left), True, BRANCO)
-        resultadoSurf2 = BASICFONT.render('{}: {}'.format("PLAYER 2", placar_right), True, BRANCO)
+        resultadoSurf1 = BASICFONT.render('{}'.format(placar_left), True, BRANCO)
+        resultadoSurf2 = BASICFONT.render('{}'.format(placar_right), True, BRANCO)
         resultadoRect1 = resultadoSurf1.get_rect()
         resultadoRect2 = resultadoSurf2.get_rect()
-        resultadoRect1.topleft = (LARGURA_TELA - 150, 25)
-        resultadoRect2.topleft = (LARGURA_TELA - 400, 25)
+        resultadoRect1.topleft = (LARGURA_TELA - 480, 25)
+        resultadoRect2.topleft = (LARGURA_TELA - 380, 25)
         DISPLAYSURF.blit(resultadoSurf1, resultadoRect1)
         DISPLAYSURF.blit(resultadoSurf2, resultadoRect2)
+
 
 def main():
     pygame.init()
     global DISPLAYSURF
     # Informações sobre a fonte do placar
     global BASICFONT, BASICFONTSIZE
-    BASICFONTSIZE = 20
-    BASICFONT = pygame.font.Font('freesansbold.ttf', BASICFONTSIZE)
+    BASICFONTSIZE = 48
+    BASICFONT = pygame.font.SysFont('unispacebold', BASICFONTSIZE)
     # Clock
     FPSCLOCK = pygame.time.Clock()
     # Display
@@ -223,7 +226,7 @@ def main():
                     # Controlar as duas paletas, a depender da posição do mouse na mesa.
                     # Se estiver mais para esquerda, controlará a paleta esquerda, se não, a paleta direita.
                     if JOGADOR == 2:
-                        if mouseX < LARGURA_TELA/2:
+                        if mouseX < LARGURA_TELA / 2:
                             paleta1.y = mouseY
                         if mouseX > LARGURA_TELA / 2:
                             paleta2.y = mouseY
@@ -232,7 +235,9 @@ def main():
         desenha_paleta(paleta1)
         desenha_paleta(paleta2)
         desenha_bola(bola)
+
         bola = movimento_bola(bola, bolaDirX, bolaDirY)
+
         bolaDirX, bolaDirY = verifica_colisao(bola, bolaDirX, bolaDirY)
         bolaDirX = bolaDirX * verifica_colisao_paletas(bola, paleta1, paleta2, bolaDirX)
 
@@ -241,8 +246,14 @@ def main():
         if JOGADOR == 1:
             paleta2 = paleta_bot(bola, bolaDirX, paleta2)
 
-        placar_left, placar_right = verifica_placar(paleta1, paleta2, bola, placar_left, placar_right, bolaDirX)
-        #print("LEFT: {} RIGHT: {}".format(placar_left, placar_right))
+        # Retorna placar dependendo da quantidade de jogadores
+        if JOGADOR == 1:
+            placar_left = verifica_placar(paleta1, paleta2, bola, placar_left, placar_right, bolaDirX)
+        else:
+            placar_left, placar_right = verifica_placar(paleta1, paleta2, bola, placar_left, placar_right, bolaDirX)
+
+        desenha_placar(placar_left, placar_right)
+
         pygame.display.update()
         FPSCLOCK.tick(FPS)
 
