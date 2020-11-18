@@ -8,30 +8,33 @@ from pygame.locals import *
 # CONSTANTES
 # FPS
 FPS = 60
-FPSCLOCK = pygame.time.Clock()
 
 # DISPLAY
 LARGURA_TELA = 800
 ALTURA_TELA = 600
 
+def main():
+    pygame.init()
+    global DISPLAYSURF
 
-pygame.init()
-tela = pygame.display.set_mode((LARGURA_TELA, ALTURA_TELA))
-pygame.display.set_caption("Pong")
+    # Clock
+    FPSCLOCK = pygame.time.Clock()
+    # Display
+    DISPLAYSURF = pygame.display.set_mode((LARGURA_TELA, ALTURA_TELA))
+    pygame.display.set_caption("Pong")
 
-terminou = False
-while not terminou:
-    # Atualiza o desenho na tela
-    pygame.display.update()
+    terminou = False
+    while not terminou:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminou = True
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            terminou = True
+        pygame.display.update()
+        FPSCLOCK.tick(FPS)
+    # Saindo do loop, encerrando janela e finalizando o pygame
+    pygame.display.quit()
+    pygame.quit()
+    sys.exit()
 
-    FPSCLOCK.tick(FPS)
-
-# Finaliza a janela
-pygame.display.quit()
-# Finaliza o pygame
-pygame.quit()
-sys.exit()
+if __name__ == '__main__':
+    main()
