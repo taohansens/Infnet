@@ -50,6 +50,18 @@ def desenha_bola(bola):
     pygame.draw.rect(DISPLAYSURF, BRANCO, bola)
 
 
+# Altera posição da bola
+bolaDirX = -1
+bolaDirY = -1
+
+
+# Função para atualizar posição da bola
+def movimento_bola(bola, eixo_x, eixo_y):
+    bola.x += eixo_x
+    bola.y += eixo_y
+    return bola
+
+
 def main():
     pygame.init()
     global DISPLAYSURF
@@ -90,6 +102,7 @@ def main():
         desenha_paleta(paleta1)
         desenha_paleta(paleta2)
         desenha_bola(bola)
+        bola = movimento_bola(bola, bolaDirX, bolaDirY)
         pygame.display.update()
         FPSCLOCK.tick(FPS)
 
