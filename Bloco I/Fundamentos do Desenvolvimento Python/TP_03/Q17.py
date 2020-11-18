@@ -67,6 +67,26 @@ def verifica_colisao(bola, bolaDirX, bolaDirY):
     return bolaDirX, bolaDirY
 
 
+# Verifica a colisão da bola com a paleta1 ou paleta2
+def verifica_colisao_paletas(bola, paleta1, paleta2, bolaDirX):
+    if bolaDirX == -1 and paleta1.right == bola.left and paleta1.top < bola.top and paleta1.bottom > bola.bottom:
+        return -1
+    elif bolaDirX == 1 and paleta2.left == bola.right and paleta2.top < bola.top and paleta2.bottom > bola.bottom:
+        return -1
+    else:
+        return 1
+
+
+def paleta_bot(bola, bolaDirX, paleta2):
+    # Movimentar a paleta quando a bola vem em direção da paleta
+    if bolaDirX == 1:
+        if paleta2.centery < bola.centery:
+            paleta2.y += 1
+        else:
+            paleta2.y -=1
+    return paleta2
+
+
 def main():
     pygame.init()
     global DISPLAYSURF
@@ -117,6 +137,9 @@ def main():
         desenha_bola(bola)
         bola = movimento_bola(bola, bolaDirX, bolaDirY)
         bolaDirX, bolaDirY = verifica_colisao(bola, bolaDirX, bolaDirY)
+        paleta2 = paleta_bot(bola, bolaDirX, paleta2)
+        bolaDirX = bolaDirX * verifica_colisao_paletas(bola, paleta1, paleta2, bolaDirX)
+
         pygame.display.update()
         FPSCLOCK.tick(FPS)
 
