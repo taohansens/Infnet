@@ -225,7 +225,6 @@ ip_net = ""
 def main():
     controle = 60
     ip_net = ip_publico()
-    print(ip_net)
     if ip_net != "":
         ip_rede = ip_net
     else:
@@ -235,10 +234,6 @@ def main():
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
-            # Para fins de desenvolvimento (Posição na tela)
-            if event.type == MOUSEBUTTONDOWN:
-                pos = pygame.mouse.get_pos()
-                print(pos)
         if controle == 60:
             rede(ip_rede)
             disco()
