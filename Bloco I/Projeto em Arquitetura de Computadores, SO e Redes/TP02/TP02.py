@@ -101,12 +101,46 @@ def middle_surface():
     surface_02.blit(sistema_op_obj, (70, pos_altura_barra + 70))
     TELA.blit(surface_02, (0, 110))
 
+
 # Disco
 def bottom_surface():
+    disk = verifica_discos()
     surface_03 = pygame.Surface(TELA_S3)
-    surface_03.convert()
-    surface_03.fill(ESCURO)
-    TELA.blit(surface_03, (0, 180))
+    surface_03.fill(CINZA)
+    # Posições em pixels
+    pos_altura_barra = 60
+    pos_final_barra = int(LARGURA_TELA - LARGURA_TELA * 0.15)
+    # Desenha barra total (em azul)
+    pygame.draw.rect(surface_03, AZUL, (70, pos_altura_barra, pos_final_barra, ESPESSURA_BARRA))
+    # Barra de uso (em vermelho)
+    pos_final_barra_uso = pos_final_barra * (disk[5] / 100)
+    pygame.draw.rect(surface_03, VERMELHO, (70, pos_altura_barra, pos_final_barra_uso, ESPESSURA_BARRA))
+
+    # Início Textos
+    perc_texto = "{}%".format(disk[5])
+
+    titulo = FONTE_TITLE.render("Espaço Total em Disco(s)", True, ESCURO)
+    percentagem_uso = FONTE_PERCENT.render(perc_texto, True, ESCURO)
+    surface_03.blit(titulo, (70, pos_altura_barra - 50))
+    surface_03.blit(percentagem_uso, (15, pos_altura_barra))
+
+    # Espaço total
+
+    qtd_total = "Encontrados: {:g}".format(round(disk[0]))
+    qtd_total_obj = FONTE_INFO.render(qtd_total, True, ESCURO)
+    mont_hds = "{}".format(disk[1])
+    mont_hds_obj = FONTE_INFO.render(mont_hds, True, ESCURO)
+    surface_03.blit(qtd_total_obj, (pos_final_barra - 50, pos_altura_barra + 20))
+    surface_03.blit(mont_hds_obj, (pos_final_barra - 40, pos_altura_barra + 40))
+
+    # Espaço livre/ocupado no hd
+    espaco_livre = "Espaço livre: {:.2f} GB".format(disk[4] / (1024.0 ** 3))
+    espaco_ocupado = "Espaço usado: {:.2f} GB".format(disk[3] / (1024.0 ** 3))
+    espaco_livre_obj = FONTE_INFO.render(espaco_livre, True, ESCURO)
+    espaco_ocupado_obj = FONTE_INFO.render(espaco_ocupado, True, ESCURO)
+    surface_03.blit(espaco_livre_obj, (70, pos_altura_barra + 20))
+    surface_03.blit(espaco_ocupado_obj, (70, pos_altura_barra + 40))
+    TELA.blit(surface_03, (0, 270))
 
 
 # FIM SURFACES
@@ -115,6 +149,39 @@ def bottom_surface():
 def uso_memoria_fisica():
     mem = psutil.virtual_memory()
     return mem
+
+
+# Verifica todos os discos do usuario:
+#   RETORNOS POR POSIÇÃO:
+#   qtd_discos[0] [int]
+#   string_com_discos[1] [str],
+#   espaco_total[2] [int],
+#   espaco_usado[3] [int],
+#   espaco_livre[4] [int]
+#   (TODAS UNIDADES EM BYTES), e a
+#   percentagem de uso [5] [int]
+def verifica_discos():
+    # verifica a quantidade de discos
+    qtd_discos = len(psutil.disk_partitions())
+    discos = []
+    espaco_total = 0
+    espaco_usado = 0
+    espaco_livre = 0
+
+    # Faz a iteração sobre os retornos do disk_partitions e disk_usage.
+    for partition in psutil.disk_partitions():
+        discos.append(partition[1])
+        espaco_total += psutil.disk_usage(partition[1])[0]
+        espaco_usado += psutil.disk_usage(partition[1])[1]
+        espaco_livre += psutil.disk_usage(partition[1])[2]
+
+    string_discos = ""
+    for i in range(len(discos)):
+        string_discos += discos[i]+" "
+
+    # Calcula a porcentagem do uso total.
+    percent_usado = round(espaco_usado / espaco_total * 100, 1)
+    return qtd_discos, string_discos, espaco_total, espaco_usado, espaco_livre, percent_usado
 
 
 def main():
