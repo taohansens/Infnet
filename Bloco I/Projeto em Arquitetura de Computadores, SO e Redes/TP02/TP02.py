@@ -150,14 +150,13 @@ def disco():
 
 
 # Rede
-def rede():
+def rede(ip_pub):
     # Interface de rede terá que ser colocada manualmente, variação muito grande.
     INTERFACE_REDE = "Wi-Fi"
 
     dic_interfaces = psutil.net_if_addrs()
     ip_rede = dic_interfaces[INTERFACE_REDE][1].address
     net_mask = dic_interfaces[INTERFACE_REDE][1].netmask
-    ip_pub = ip_publico()
     ip_local = "IPv4 Local: {}".format(ip_rede)
     ip_public = "IP Público: {}".format(ip_pub)
     ip_netmask = "Máscara de Sub-rede: {}".format(net_mask)
@@ -219,8 +218,18 @@ def ip_publico():
     return re.compile(r'Address: (\d+\.\d+\.\d+\.\d+)').search(data).group(1)
 
 
+# Variável inicializada vazia (IP_Externo)
+ip_net = ""
+
+
 def main():
     controle = 60
+    ip_net = ip_publico()
+    print(ip_net)
+    if ip_net != "":
+        ip_rede = ip_net
+    else:
+        ip_rede = 'Sem conexão.'
     while True:
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -231,7 +240,7 @@ def main():
                 pos = pygame.mouse.get_pos()
                 print(pos)
         if controle == 60:
-            rede()
+            rede(ip_rede)
             disco()
             processador()
             memoria(uso_memoria_fisica())
