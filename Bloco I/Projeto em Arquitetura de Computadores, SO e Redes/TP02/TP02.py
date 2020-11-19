@@ -1,6 +1,11 @@
-import pygame, sys
-import psutil
+# Importação de bibliotecas
 import platform
+import psutil
+import re
+from urllib.request import urlopen
+
+import pygame
+import sys
 from pygame.locals import *
 
 # INICIA PYGAME
@@ -143,10 +148,28 @@ def disco():
     surface_03.blit(espaco_ocupado_obj, (70, pos_altura_barra + 40))
     TELA.blit(surface_03, (0, 270))
 
+
 # Rede
 def rede():
+    # Interface de rede terá que ser colocada manualmente, variação muito grande.
+    INTERFACE_REDE = "Wi-Fi"
+
+    dic_interfaces = psutil.net_if_addrs()
+    ip_rede = dic_interfaces[INTERFACE_REDE][1].address
+    net_mask = dic_interfaces[INTERFACE_REDE][1].netmask
+    ip_pub = ip_publico()
+    ip_local = "IPv4 Local: {}".format(ip_rede)
+    ip_public = "IP Público: {}".format(ip_pub)
+    ip_netmask = "Máscara de Sub-rede: {}".format(net_mask)
+    ip_local_obj = FONTE_TITLE.render(ip_local, True, ESCURO)
+    ip_netmask_obj = FONTE_INFO.render(ip_netmask, True, ESCURO)
+    ip_pub_obj = FONTE_TITLE.render(ip_public, True, ESCURO)
     surface_04 = pygame.Surface(TELA_S4)
     surface_04.fill(CINZA)
+    surface_04.blit(ip_local_obj, (70, 160))
+    surface_04.blit(ip_pub_obj, (70, 200))
+    surface_04.blit(ip_netmask_obj, (70, 250))
+
     TELA.blit(surface_04, (0, 270))
 # FIM SURFACES
 
@@ -188,6 +211,12 @@ def verifica_discos():
     # Calcula a porcentagem do uso total.
     percent_usado = round(espaco_usado / espaco_total * 100, 1)
     return qtd_discos, string_discos, espaco_total, espaco_usado, espaco_livre, percent_usado
+
+
+# Verifica o IP público que acessou a página do dyndns.
+def ip_publico():
+    data = str(urlopen('http://checkip.dyndns.com/').read())
+    return re.compile(r'Address: (\d+\.\d+\.\d+\.\d+)').search(data).group(1)
 
 
 def main():
