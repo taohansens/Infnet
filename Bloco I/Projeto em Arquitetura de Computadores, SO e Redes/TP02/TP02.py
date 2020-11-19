@@ -29,13 +29,14 @@ BRANCO = (255, 255, 255)
 # CONSTANTES COM O TAMANHO DA TELA
 TELA_S1 = (LARGURA_TELA, ALTURA_TELA // 3 - 90)
 TELA_S2 = (LARGURA_TELA, ALTURA_TELA // 3 - 20)
-TELA_S3 = (LARGURA_TELA, ALTURA_TELA // 3 + 50)
+TELA_S3 = (LARGURA_TELA, ALTURA_TELA // 3 - 50)
+TELA_S4 = (LARGURA_TELA, ALTURA_TELA // 2 + 100)
 
 ESPESSURA_BARRA = 15
 
 
 # Memória
-def top_surface(memoria):
+def memoria(memoria):
     surface_01 = pygame.Surface(TELA_S1)
     surface_01.fill(CINZA)
     # Posições em pixels
@@ -69,7 +70,7 @@ def top_surface(memoria):
 
 
 # Processador
-def middle_surface():
+def processador():
     uso_cpu = psutil.cpu_percent(interval=0)
     surface_02 = pygame.Surface(TELA_S2)
     surface_02.fill(CINZA)
@@ -103,7 +104,7 @@ def middle_surface():
 
 
 # Disco
-def bottom_surface():
+def disco():
     disk = verifica_discos()
     surface_03 = pygame.Surface(TELA_S3)
     surface_03.fill(CINZA)
@@ -119,7 +120,7 @@ def bottom_surface():
     # Início Textos
     perc_texto = "{}%".format(disk[5])
 
-    titulo = FONTE_TITLE.render("Espaço Total em Disco(s)", True, ESCURO)
+    titulo = FONTE_TITLE.render("Espaço Total em Disco", True, ESCURO)
     percentagem_uso = FONTE_PERCENT.render(perc_texto, True, ESCURO)
     surface_03.blit(titulo, (70, pos_altura_barra - 50))
     surface_03.blit(percentagem_uso, (15, pos_altura_barra))
@@ -142,8 +143,13 @@ def bottom_surface():
     surface_03.blit(espaco_ocupado_obj, (70, pos_altura_barra + 40))
     TELA.blit(surface_03, (0, 270))
 
-
+# Rede
+def rede():
+    surface_04 = pygame.Surface(TELA_S4)
+    surface_04.fill(CINZA)
+    TELA.blit(surface_04, (0, 270))
 # FIM SURFACES
+
 
 # Função que retorna as infos sobre a memória
 def uso_memoria_fisica():
@@ -196,9 +202,10 @@ def main():
                 pos = pygame.mouse.get_pos()
                 print(pos)
         if controle == 60:
-            bottom_surface()
-            middle_surface()
-            top_surface(uso_memoria_fisica())
+            rede()
+            disco()
+            processador()
+            memoria(uso_memoria_fisica())
             controle = 0
         pygame.display.update()
         controle += 1
