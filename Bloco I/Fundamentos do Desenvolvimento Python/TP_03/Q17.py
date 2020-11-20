@@ -16,7 +16,7 @@ JOGADOR = 0
 
 # CONSTANTES
 # FPS
-FPS = 60
+FPS = 5000
 
 # DISPLAY
 LARGURA_TELA = 800
@@ -78,9 +78,9 @@ def verifica_colisao(bola, bolaDirX, bolaDirY):
 
 # Verifica a colisão da bola com a paleta1 ou paleta2
 def verifica_colisao_paletas(bola, paleta1, paleta2, bolaDirX):
-    if bolaDirX == -1 and paleta1.right == bola.left and paleta1.top < bola.top and paleta1.bottom > bola.bottom:
+    if bolaDirX == -1 and paleta1.right == bola.left and paleta1.top <= bola.top and paleta1.bottom >= bola.bottom:
         return -1
-    elif bolaDirX == 1 and paleta2.left == bola.right and paleta2.top < bola.top and paleta2.bottom > bola.bottom:
+    elif bolaDirX == 1 and paleta2.left == bola.right and paleta2.top <= bola.top and paleta2.bottom >= bola.bottom:
         return -1
     else:
         return 1
