@@ -15,8 +15,6 @@ from pygame.locals import *
 JOGADOR = 0
 
 # CONSTANTES
-# FPS
-FPS = 5000
 
 # DISPLAY
 LARGURA_TELA = 800
@@ -139,12 +137,12 @@ def verifica_placar(paleta1, paleta2, bola, placar_left, placar_right, bolaDirX)
             return placar_left, placar_right
 
         # Se a bola encostar na paleta do lado esquerdo, soma +1 ponto.
-        elif bolaDirX == 1 and paleta1.right == bola.left and paleta1.top < bola.top and paleta1.bottom > bola.bottom:
+        elif bolaDirX == 1 and paleta1.right == bola.left and paleta1.top <= bola.top and paleta1.bottom >= bola.bottom:
             placar_left += 1
             return placar_left, placar_right
 
         # Se a bola encostar na paleta do lado direito, soma +1 ponto.
-        elif bolaDirX == -1 and paleta2.left == bola.right and paleta2.top < bola.top and paleta2.bottom > bola.bottom:
+        elif bolaDirX == -1 and paleta2.left == bola.right and paleta2.top <= bola.top and paleta2.bottom >= bola.bottom:
             placar_right += 1
             return placar_left, placar_right
 
@@ -173,6 +171,8 @@ def desenha_placar(placar_left, placar_right):
 
 def main():
     pygame.init()
+    # FPS
+    FPS = 120
     global DISPLAYSURF
     # Informações sobre a fonte do placar
     global BASICFONT, BASICFONTSIZE
@@ -210,6 +210,7 @@ def main():
     desenha_paleta(paleta2)
     desenha_bola(bola)
 
+    placar_anterior = 0
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -253,9 +254,17 @@ def main():
             placar_left, placar_right = verifica_placar(paleta1, paleta2, bola, placar_left, placar_right, bolaDirX)
 
         desenha_placar(placar_left, placar_right)
+        multiplo_10 = placar_left % 2 == 0
+        placar_atual = placar_left
 
+        if multiplo_10 and placar_atual != placar_anterior:
+            placar_anterior = placar_left
+            FPS += 100
+            placar_atual = placar_left
         pygame.display.update()
         FPSCLOCK.tick(FPS)
+
+        print(FPS)
 
 
 if __name__ == '__main__':
