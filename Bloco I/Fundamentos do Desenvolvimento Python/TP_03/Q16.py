@@ -30,7 +30,7 @@ def desenhar_estrela(x, y, tamanho):
     pygame.draw.polygon(surface01, amarelo, pontos_estrela)
     # Pontos de estrela obtido dos pontos de vetor em formato de estrela (5 pontas).
     tela.fill(branco)
-    tela.blit(surface01, (x - 189/2,y))
+    tela.blit(surface01, (x - 189*tamanho/2,y))
 
 
 tela.fill(branco)
@@ -44,7 +44,7 @@ while not terminou:
             terminou = True
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             pos1, pos2 = pygame.mouse.get_pos()
-            tamanho = random.uniform(0.4, 2)
+            tamanho = random.uniform(0.1, 2)
             desenhar_estrela(pos1, pos2, tamanho)
             pygame.display.update()
 
