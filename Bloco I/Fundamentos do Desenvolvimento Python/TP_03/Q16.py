@@ -1,11 +1,10 @@
 """
-Q.16 Usando a biblioteca Pygame, escreva um programa que desenha na tela estrelas de 5 pontas de tamanhos aleatórios a
-cada vez que o usuário clicar na tela. A ponta superior da estrela deve estar situada onde o usuário clicou.
-(código e printscreen)
+Usando a biblioteca Pygame, escreva um programa que possui uma função que desenha na tela um estrela de 5 pontas no
+tamanho que preferir. (código e printscreen)
 """
+import random
 
 import pygame
-import random
 
 pygame.init()
 largura_tela = 800
@@ -15,47 +14,41 @@ tela = pygame.display.set_mode((largura_tela, altura_tela))
 
 # Lista de cores
 branco = (255, 255, 255)
-amarelo = (241, 196, 15)
+amarelo = (243, 156, 18)
 
 
-# Função para desenhar quadrado vermelhor com lado 100px.
-def desenha_estrela(x, y, tamanho):
+# Função para desenhar círculo azul com raio 50px.
+def desenhar_estrela(x, y, tamanho):
+    surface01 = pygame.Surface((189*tamanho, 200*tamanho))
+    surface01.fill(branco)
+
+    pontos_estrela = [[144, 111], [158, 176], [98, 148], [42, 182], [50, 116], [1, 74], [65, 61], [91, 1], [123, 58], [189, 64]]
+    poligono_scale = pontos_estrela.copy()
+    for pontos in poligono_scale:
+        pontos[0] *= tamanho
+        pontos[1] *= tamanho
+    pygame.draw.polygon(surface01, amarelo, pontos_estrela)
+    # Pontos de estrela obtido dos pontos de vetor em formato de estrela (5 pontas).
     tela.fill(branco)
-    #poligono = [[100, 198], [40, 10], [190, 130], [10, 130], [160, 10]]
-    # tamanho original
-    poligono = [[x-100, y-198], [x-40, y-10], [x-190, y-130], [x-10, y-130], [x-160, y-10]]
-    # transforma o polígono no tamanho random.
-    poligono_scale = poligono.copy()
-    for ponto in poligono_scale:
-        ponto[0] *= tamanho
-        ponto[1] *= tamanho
-    pygame.draw.polygon(tela, amarelo, poligono_scale)
+    tela.blit(surface01, (x - 189/2,y))
 
+
+tela.fill(branco)
+pygame.display.update()
 
 terminou = False
-posicao_atual = [largura_tela/2, altura_tela/2]
-# tamanho inicial
-tamanho = 1
-desenha_estrela(*posicao_atual, tamanho)
-
 while not terminou:
-    # atualiza a tela
-    pygame.display.update()
     # Terminar programa se Quit.
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             terminou = True
-        # Verificar eventos do mouse;
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             pos1, pos2 = pygame.mouse.get_pos()
-            print("pos mouse: ", pos1,pos2)
-            print(posicao_atual)
-            # Alinha ao centro do quadrado
-            posicao_atual = (pos1, pos2)
             tamanho = random.uniform(0.4, 2)
-            print(tamanho)
+            desenhar_estrela(pos1, pos2, tamanho)
+            pygame.display.update()
 
-        desenha_estrela(*posicao_atual, tamanho)
+
 # finaliza a janela do jogo
 pygame.display.quit()
 # finaliza o pygame
