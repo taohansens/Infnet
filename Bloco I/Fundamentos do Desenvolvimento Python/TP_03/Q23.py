@@ -1,7 +1,6 @@
 import sys
 
 import pygame
-import math
 
 # Inicializa pyGame
 pygame.init()
@@ -18,12 +17,13 @@ CINZA = (200, 200, 200)
 VERMELHO = (255, 0, 0)
 AZUL = (0, 0, 255)
 
-# Imagens
-X_IMAGE = pygame.transform.scale(pygame.image.load("Images/x.png"), (150, 150))
-O_IMAGE = pygame.transform.scale(pygame.image.load("Images/o.png"), (150, 150))
-
 # Fonte
-FONTE = pygame.font.SysFont('courier', 40)
+FONTE = pygame.font.SysFont('segoi', 40)
+DESENHA_JOGADA = pygame.font.SysFont('segoi', 180)
+
+# Cria variável com placares
+# pos[0] = X ; pos[1] = BOLA; pos[2] =
+placar = [0, 0, 0]
 
 
 def desenha_tabuleiro():
@@ -57,12 +57,23 @@ def matriz_pos():
     return lista_posicoes
 
 
-def checa_vitoria(posicoes):
-    # Checa as colunas
+# Função para adicionar +1 no placar de quem ganhar..
+def soma_placar(pos, placar):
+    if pos == 'x':
+        placar[0] += 1
+    if pos == 'o':
+        placar[1] += 1
+    print("GANHOU =", placar)
 
+
+# Função para checar se houve vitória.
+def checa_vitoria(posicoes, placar):
+    # Checa as colunas
     for coluna in range(len(posicoes)):
-        if (posicoes[0][coluna][2] == posicoes[1][coluna][2] == posicoes[2][coluna][2]) and posicoes[coluna][coluna][2] != "":
-            print("vitória na coluna de: ", posicoes[0][coluna][2])
+        if (posicoes[0][coluna][2] == posicoes[1][coluna][2] == posicoes[2][coluna][2]) and posicoes[coluna][coluna][2] \
+                != "":
+            soma_placar(posicoes[0][coluna][2], placar)
+            tela_final('"' + posicoes[0][coluna][2].upper()+'"' + " GANHOU!", placar)
             # DEV
             print(posicoes)
             return True
@@ -70,37 +81,59 @@ def checa_vitoria(posicoes):
     # Checa as linhas
     for linha in range(len(posicoes)):
         if (posicoes[linha][0][2] == posicoes[linha][1][2] == posicoes[linha][2][2]) and posicoes[linha][0][2] != "":
-            print("vitória na linha de: ", posicoes[linha][0][2])
+            soma_placar(posicoes[linha][0][2], placar)
+            tela_final('"' + posicoes[linha][0][2].upper() + '"' + " GANHOU!", placar)
             # DEV
             print(posicoes)
             return True
+
     # Checa as diagonais
     if (posicoes[0][0][2] == posicoes[1][1][2] == posicoes[2][2][2]) and posicoes[0][0][2] != "":
-        print("vitória na diagonal1 de: ", posicoes[0][0][2])
+        soma_placar(posicoes[0][0][2], placar)
+        tela_final('"' + posicoes[0][0][2].upper() + '"' + " GANHOU!", placar)
         return True
     if (posicoes[0][2][2] == posicoes[1][1][2] == posicoes[2][0][2]) and posicoes[0][2][2] != "":
-        print("vitória na diagonal2 de: ", posicoes[0][2][2])
+        soma_placar(posicoes[0][2][2], placar)
+        tela_final('"' + posicoes[0][2][2].upper() + '"' + " GANHOU!", placar)
         return True
 
     # Se não houve vencedor, returna False.
     return False
 
 
-def checa_empate(posicoes):
+def checa_empate(posicoes, placar):
     # Verifica se ainda há char vazio na posição [2] da matriz, se sim, jogo ainda não acabou
     for i in range(len(posicoes)):
         for j in range(len(posicoes[i])):
             if posicoes[i][j][2] == "":
                 return False
+    # Soma + 1 no array placar na posição de empate.
+    placar[2] += 1
+    tela_final("EMPATE", placar)
     # Todas opções foram preenchidas e o checa_vitoria não identificou vencedor, empate = True.
-    print("EMPATE")
     return True
+
+
+def tela_final(mensagem, placar):
+    pygame.time.delay(300)
+    win.fill(BRANCO)
+    texto = FONTE.render(mensagem, True, PRETO)
+    vit_x = FONTE.render("X: {}".format(placar[0]), True, PRETO)
+    vit_o = FONTE.render("O: {}".format(placar[1]), True, PRETO)
+    draw = FONTE.render("EMPATES: {}".format(placar[2]), True, PRETO)
+    win.blit(texto, ((SIZE_TELA - texto.get_width()) // 2, (SIZE_TELA - texto.get_height()) // 2 - 100))
+    win.blit(vit_x, ((SIZE_TELA) // 2, (SIZE_TELA - texto.get_height()) // 2 + 10))
+    win.blit(vit_o, ((SIZE_TELA) // 2, (SIZE_TELA - texto.get_height()) //2 + 40))
+    win.blit(draw, ((SIZE_TELA) // 2, (SIZE_TELA - texto.get_height()) //2 + 70 ))
+
+    pygame.display.update()
+    pygame.time.delay(1500)
 
 
 # Função principal
 def main():
 
-    # Inicializa uma lista que receberá as variáveis (posx, posy, imagemX ou imagemY) para realizar o desenho na tela.
+    # Inicializa uma lista que receberá as variáveis (posx, posy, str(X) ou str(o) para realizar o desenho na tela.
     desenho = []
 
     # Controle das jogadas, iniciar com "X"
@@ -132,7 +165,7 @@ def main():
                             # Se for a vez do X:
                             if vez_xis:
                                 # Adiciona na lista a posição já calculada do quadrado para desenhar e a imagem do X.
-                                desenho.append((x, y, X_IMAGE))
+                                desenho.append((x, y, "X"))
                                 # Seta a vez de bola para falsa, e xis True
                                 vez_xis = False
                                 vez_bola = True
@@ -141,13 +174,12 @@ def main():
 
                             # Mesma lógica para a vez "Bola".
                             elif vez_bola:
-                                desenho.append((x, y, O_IMAGE))
+                                desenho.append((x, y, "O"))
                                 # Seta a vez de bola para falsa, e xis True
                                 vez_bola = False
                                 vez_xis = True
                                 # Adiciona a posição da matriz, o caracter que foi jogado, e marca a célula como JOGADA.
                                 posicoes[i][j] = (x, y, 'o', True)
-
 
         # Desenhar o tabuleiro (3x3)
         desenha_tabuleiro()
@@ -155,11 +187,13 @@ def main():
         # Desenhar X ou Bola:
         for jogada in desenho:
             x, y, xis_or_bola = jogada
-            win.blit(xis_or_bola, (x - xis_or_bola.get_width() // 2, y - xis_or_bola.get_height() // 2))
+            imagem = DESENHA_JOGADA.render('{}'.format(xis_or_bola), True, PRETO)
+            win.blit(imagem, (x - imagem.get_width() // 2, y - imagem.get_height() // 2))
 
-        if checa_vitoria(posicoes) or checa_empate(posicoes):
+        if checa_vitoria(posicoes, placar) or checa_empate(posicoes, placar):
             fim_da_partida = True
             print("FIM DA PARTIDA")
+            print(placar)
 
         pygame.display.update()
 
