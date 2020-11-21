@@ -36,3 +36,21 @@ def desenha_tabuleiro():
         # Desenha 3 colunas
         pygame.draw.line(win, CINZA, (0, x), (SIZE_TELA, x), 3)
 
+
+# Inicializa a matriz com as posições centrais de cada célula.
+def inicializa_matriz_pos():
+    # Calcula o ponto de centro da célula
+    centro_celula = SIZE_TELA // 3 // 2
+
+    # Cria matriz com as posições das células,
+    lista_posicoes = [[None, None, None], [None, None, None], [None, None, None]]
+
+    for i in range(len(lista_posicoes)):
+        for j in range(len(lista_posicoes[i])):
+            x = centro_celula * (2 * j + 1)
+            print(x)
+            y = centro_celula * (2 * i + 1)
+            # Adiciona as coordenadas do centro de cada célula e adiciona na sua respectiva pos. da matriz.
+            lista_posicoes[i][j] = (x, y, "", True)
+            print(lista_posicoes[i], [j])
+    return lista_posicoes
