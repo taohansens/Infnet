@@ -1,3 +1,5 @@
+import sys
+
 import pygame
 import math
 
@@ -38,7 +40,7 @@ def desenha_tabuleiro():
 
 
 # Inicializa a matriz com as posições centrais de cada célula.
-def inicializa_matriz_pos():
+def matriz_pos():
     # Calcula o ponto de centro da célula
     centro_celula = SIZE_TELA // 3 // 2
 
@@ -59,13 +61,26 @@ def inicializa_matriz_pos():
 # Função principal
 def main():
 
+    # Controle das jogadas, iniciar com "X"
+    vez_x = True
+    vez_o = False
+
+    posicoes = matriz_pos()
+
     fim_da_partida = False
     while not fim_da_partida:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                pygame.display.quit()
                 pygame.quit()
-
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                # Captura posição ao clicar
+                pos_x, pos_y = pygame.mouse.get_pos()
+                print(pos_x, pos_y)
         win.fill(BRANCO)
+
+        # desenhar o tabuleiro (3x3)
         desenha_tabuleiro()
         pygame.display.update()
 
