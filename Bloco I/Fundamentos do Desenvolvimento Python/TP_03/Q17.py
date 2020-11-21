@@ -211,6 +211,8 @@ def main():
     desenha_bola(bola)
 
     placar_anterior = 0
+    # A cada aumento de velocidade, irá aumentar 50FPS
+    velocidade = 50
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -257,14 +259,14 @@ def main():
         multiplo_10 = placar_left % 2 == 0
         placar_atual = placar_left
 
+        # Lógica para aumentar velocidade do jogo
         if multiplo_10 and placar_atual != placar_anterior:
             placar_anterior = placar_left
-            FPS += 100
+            FPS += velocidade
             placar_atual = placar_left
+
         pygame.display.update()
         FPSCLOCK.tick(FPS)
-
-        print(FPS)
 
 
 if __name__ == '__main__':
