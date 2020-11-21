@@ -34,9 +34,9 @@ def desenha_tabuleiro():
     for i in range(3):
         x = i * distancia
         # Desenha 3 linhas
-        pygame.draw.line(win, CINZA, (x, 0), (x, SIZE_TELA), 3)
+        pygame.draw.line(win, PRETO, (x, 0), (x, SIZE_TELA), 3)
         # Desenha 3 colunas
-        pygame.draw.line(win, CINZA, (0, x), (SIZE_TELA, x), 3)
+        pygame.draw.line(win, PRETO, (0, x), (SIZE_TELA, x), 3)
 
 
 # Inicializa a matriz com as posições centrais de cada célula.
@@ -50,23 +50,27 @@ def matriz_pos():
     for i in range(len(lista_posicoes)):
         for j in range(len(lista_posicoes[i])):
             x = centro_celula * (2 * j + 1)
-            print(x)
             y = centro_celula * (2 * i + 1)
             # Adiciona as coordenadas do centro de cada célula e adiciona na sua respectiva pos. da matriz.
-            lista_posicoes[i][j] = (x, y, "", True)
-            print(lista_posicoes[i], [j])
+            # Adiciona na posição [3] um boolean para verificar se a célula já foi preenchida ou não.
+            lista_posicoes[i][j] = (x, y, "", False)
     return lista_posicoes
 
 
 # Função principal
 def main():
 
+    # Inicializa uma lista que receberá as variáveis (posx, posy, imagemX ou imagemY) para realizar o desenho na tela.
+    desenho = []
+
     # Controle das jogadas, iniciar com "X"
-    vez_x = True
-    vez_o = False
+    vez_xis = True
+    vez_bola = False
+
+    # Preencher fundo com a cor branca.
+    win.fill(BRANCO)
 
     posicoes = matriz_pos()
-
     fim_da_partida = False
     while not fim_da_partida:
         for event in pygame.event.get():
@@ -77,10 +81,28 @@ def main():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 # Captura posição ao clicar
                 pos_x, pos_y = pygame.mouse.get_pos()
-                print(pos_x, pos_y)
-        win.fill(BRANCO)
 
-        # desenhar o tabuleiro (3x3)
+                for i in range(len(posicoes)):
+                    for j in range(len(posicoes)):
+                        x, y, char, celula_jogada = posicoes[i][j]
+                        # Distancia entre a posição do mouse e o centro do quadrado
+                        distancia = ((x - pos_x) ** 2 + (y - pos_y) ** 2) ** 0.5
+
+                        # Se estiver no quadrado, e a célula ainda não tiver sido jogada:
+                        if distancia < SIZE_TELA // 3 // 2 and not celula_jogada:
+                            # Se for a vez do X:
+                            if vez_xis:
+                                # Adiciona na lista a posição já calculada do quadrado para desenhar e a imagem do X.
+                                desenho.append((x, y, X_IMAGE))
+                                # Seta a vez de xis para false
+                                vez_xis = False
+                                # Adiciona a posição da matriz, o caracter que foi jogado, e marca a célula como JOGADA.
+                                posicoes[i][j] = (x, y, 'x', True)
+                                # DEV, mostra array da posição marcada
+                                print(posicoes)
+
+
+        # Desenhar o tabuleiro (3x3)
         desenha_tabuleiro()
         pygame.display.update()
 
