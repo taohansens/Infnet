@@ -1,5 +1,5 @@
 """
-Usando a biblioteca Pygame, escreva um programa que possui uma função que desenha na tela um estrela de 5 pontas no
+Q.16 Usando a biblioteca Pygame, escreva um programa que possui uma função que desenha na tela um estrela de 5 pontas no
 tamanho que preferir. (código e printscreen)
 """
 import random
@@ -17,18 +17,17 @@ branco = (255, 255, 255)
 amarelo = (243, 156, 18)
 
 
-# Função para desenhar círculo azul com raio 50px.
+# Função para desenhar a estrela, recebendo o fator de escala (tamanho).
 def desenhar_estrela(x, y, tamanho):
     surface01 = pygame.Surface((189*tamanho, 200*tamanho))
     surface01.fill(branco)
-
+    # Pontos de estrela obtido dos pontos de vetor em formato de estrela (5 pontas).
     pontos_estrela = [[144, 111], [158, 176], [98, 148], [42, 182], [50, 116], [1, 74], [65, 61], [91, 1], [123, 58], [189, 64]]
     poligono_scale = pontos_estrela.copy()
     for pontos in poligono_scale:
         pontos[0] *= tamanho
         pontos[1] *= tamanho
     pygame.draw.polygon(surface01, amarelo, pontos_estrela)
-    # Pontos de estrela obtido dos pontos de vetor em formato de estrela (5 pontas).
     tela.fill(branco)
     tela.blit(surface01, (x - 189*tamanho/2,y))
 
@@ -44,6 +43,7 @@ while not terminou:
             terminou = True
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             pos1, pos2 = pygame.mouse.get_pos()
+            # tamanho aleatório entre 0.1x e 2x
             tamanho = random.uniform(0.1, 2)
             desenhar_estrela(pos1, pos2, tamanho)
             pygame.display.update()
