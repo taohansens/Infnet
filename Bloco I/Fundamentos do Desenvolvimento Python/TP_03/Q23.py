@@ -58,19 +58,28 @@ def matriz_pos():
 
 
 def checa_vitoria(posicoes):
-    # Checa as linhas
-    for row in range(len(posicoes)):
-        if (posicoes[0][2] == posicoes[1][2] == posicoes[2][2]) and posicoes[0][2] != "":
-            print("vitória de: ", posicoes[0][2])
-            return True
     # Checa as colunas
-    for col in range(len(posicoes)):
-        if (posicoes[0][2] == posicoes[1][2] == posicoes[2][2]) and posicoes[0][2] != "":
+
+    for coluna in range(len(posicoes)):
+        if (posicoes[0][coluna][2] == posicoes[1][coluna][2] == posicoes[2][coluna][2]) and posicoes[coluna][coluna][2] != "":
+            print("vitória na coluna de: ", posicoes[0][coluna][2])
+            # DEV
+            print(posicoes)
+            return True
+
+    # Checa as linhas
+    for linha in range(len(posicoes)):
+        if (posicoes[linha][0][2] == posicoes[linha][1][2] == posicoes[linha][2][2]) and posicoes[linha][0][2] != "":
+            print("vitória na linha de: ", posicoes[linha][0][2])
+            # DEV
+            print(posicoes)
             return True
     # Checa as diagonais
     if (posicoes[0][0][2] == posicoes[1][1][2] == posicoes[2][2][2]) and posicoes[0][0][2] != "":
+        print("vitória na diagonal1 de: ", posicoes[0][0][2])
         return True
     if (posicoes[0][2][2] == posicoes[1][1][2] == posicoes[2][0][2]) and posicoes[0][2][2] != "":
+        print("vitória na diagonal2 de: ", posicoes[0][2][2])
         return True
 
     # Se não houve vencedor, returna False.
@@ -112,8 +121,6 @@ def main():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 # Captura posição ao clicar
                 pos_x, pos_y = pygame.mouse.get_pos()
-
-
                 for i in range(len(posicoes)):
                     for j in range(len(posicoes)):
                         x, y, char, celula_jogada = posicoes[i][j]
@@ -140,12 +147,15 @@ def main():
                                 vez_xis = True
                                 # Adiciona a posição da matriz, o caracter que foi jogado, e marca a célula como JOGADA.
                                 posicoes[i][j] = (x, y, 'o', True)
-                # DEV:  mostra o array das posições após o click
-                print(posicoes)
-                print(posicoes[0][2], posicoes[1][2], posicoes[2][2])
+
 
         # Desenhar o tabuleiro (3x3)
         desenha_tabuleiro()
+
+        # Desenhar X ou Bola:
+        for jogada in desenho:
+            x, y, xis_or_bola = jogada
+            win.blit(xis_or_bola, (x - xis_or_bola.get_width() // 2, y - xis_or_bola.get_height() // 2))
 
         if checa_vitoria(posicoes) or checa_empate(posicoes):
             fim_da_partida = True
