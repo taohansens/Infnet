@@ -94,12 +94,27 @@ def main():
                             if vez_xis:
                                 # Adiciona na lista a posição já calculada do quadrado para desenhar e a imagem do X.
                                 desenho.append((x, y, X_IMAGE))
-                                # Seta a vez de xis para false
+                                # Seta a vez de bola para falsa, e xis True
                                 vez_xis = False
+                                vez_bola = True
                                 # Adiciona a posição da matriz, o caracter que foi jogado, e marca a célula como JOGADA.
                                 posicoes[i][j] = (x, y, 'x', True)
                                 # DEV, mostra array da posição marcada
-                                print(posicoes)
+                                print("X Jogou: ",posicoes)
+                                print(desenho)
+                            # Mesma lógica para a vez "Bola".
+                            elif vez_bola:
+                                desenho.append((x, y, O_IMAGE))
+                                # Seta a vez de bola para falsa, e xis True
+                                vez_bola = False
+                                vez_xis = True
+                                # Adiciona a posição da matriz, o caracter que foi jogado, e marca a célula como JOGADA.
+                                posicoes[i][j] = (x, y, 'o', True)
+                                # DEV, mostra array da posição marcada
+                                print("Bola Jogou: ", posicoes)
+                                print(desenho)
+
+
 
 
         # Desenhar o tabuleiro (3x3)
