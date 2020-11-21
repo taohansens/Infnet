@@ -57,6 +57,37 @@ def matriz_pos():
     return lista_posicoes
 
 
+def checa_vitoria(posicoes):
+    # Checa as linhas
+    for row in range(len(posicoes)):
+        if (posicoes[0][2] == posicoes[1][2] == posicoes[2][2]) and posicoes[0][2] != "":
+            print("vitória de: ", posicoes[0][2])
+            return True
+    # Checa as colunas
+    for col in range(len(posicoes)):
+        if (posicoes[0][2] == posicoes[1][2] == posicoes[2][2]) and posicoes[0][2] != "":
+            return True
+    # Checa as diagonais
+    if (posicoes[0][0][2] == posicoes[1][1][2] == posicoes[2][2][2]) and posicoes[0][0][2] != "":
+        return True
+    if (posicoes[0][2][2] == posicoes[1][1][2] == posicoes[2][0][2]) and posicoes[0][2][2] != "":
+        return True
+
+    # Se não houve vencedor, returna False.
+    return False
+
+
+def checa_empate(posicoes):
+    # Verifica se ainda há char vazio na posição [2] da matriz, se sim, jogo ainda não acabou
+    for i in range(len(posicoes)):
+        for j in range(len(posicoes[i])):
+            if posicoes[i][j][2] == "":
+                return False
+    # Todas opções foram preenchidas e o checa_vitoria não identificou vencedor, empate = True.
+    print("EMPATE")
+    return True
+
+
 # Função principal
 def main():
 
@@ -82,6 +113,7 @@ def main():
                 # Captura posição ao clicar
                 pos_x, pos_y = pygame.mouse.get_pos()
 
+
                 for i in range(len(posicoes)):
                     for j in range(len(posicoes)):
                         x, y, char, celula_jogada = posicoes[i][j]
@@ -99,9 +131,7 @@ def main():
                                 vez_bola = True
                                 # Adiciona a posição da matriz, o caracter que foi jogado, e marca a célula como JOGADA.
                                 posicoes[i][j] = (x, y, 'x', True)
-                                # DEV, mostra array da posição marcada
-                                print("X Jogou: ",posicoes)
-                                print(desenho)
+
                             # Mesma lógica para a vez "Bola".
                             elif vez_bola:
                                 desenho.append((x, y, O_IMAGE))
@@ -110,15 +140,17 @@ def main():
                                 vez_xis = True
                                 # Adiciona a posição da matriz, o caracter que foi jogado, e marca a célula como JOGADA.
                                 posicoes[i][j] = (x, y, 'o', True)
-                                # DEV, mostra array da posição marcada
-                                print("Bola Jogou: ", posicoes)
-                                print(desenho)
-
-
-
+                # DEV:  mostra o array das posições após o click
+                print(posicoes)
+                print(posicoes[0][2], posicoes[1][2], posicoes[2][2])
 
         # Desenhar o tabuleiro (3x3)
         desenha_tabuleiro()
+
+        if checa_vitoria(posicoes) or checa_empate(posicoes):
+            fim_da_partida = True
+            print("FIM DA PARTIDA")
+
         pygame.display.update()
 
 
