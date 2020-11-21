@@ -1,6 +1,6 @@
 """
 PONG:
-Q.17 Usando a biblioteca Pygame, escreva um programa que implemente o jogo “Pong” (visto no curso), com uma modificação.
+Usando a biblioteca Pygame, escreva um programa que implemente o jogo “Pong” (visto no curso), com uma modificação.
 Tal modificação consiste em incluir o aumento da velocidade da bola. O aumento será feito de maneira gradual, isto é, cada 10 vezes que a bola bater na paleta do jogador1 a velocidade aumenta em 1. (código e printscreen)
 [x] + várias modificações.
 """
@@ -57,63 +57,31 @@ def desenha_bola(bola):
     pygame.draw.rect(DISPLAYSURF, BRANCO, bola)
 
 
-# Função para atualizar posição da bola de acordo com a velocidade
-def movimento_bola(bola, eixo_x, eixo_y, acelerador):
-    bola.x += eixo_x + acelerador[0]
-    bola.y += eixo_y + acelerador[1]
+# Função para atualizar posição da bola
+def movimento_bola(bola, eixo_x, eixo_y):
+    bola.x += eixo_x
+    bola.y += eixo_y
     return bola
-
-
-# Função para parar de aumentar a velocidade de acordo com o max.
-def controle_velocidade(velocidade):
-    velocidade_maxima = 8
-    if velocidade <= velocidade_maxima:
-        velocidade += 1
-    else:
-        velocidade = 8
 
 
 # Verifica por colisão com as bordas
 # Retorna uma nova posição caso exista colisão
-def verifica_colisao(bola, bolaDirX, bolaDirY, acelerador):
-    vel_x = acelerador[0]
-    vel_y = acelerador[1]
-    print(vel_x, vel_y)
-    # Colisão no lado esquerdo
-    #if bola.left <= (LARGURA_LINHA):
-     #   bola.x = LARGURA_LINHA + (vel_x * -1)
-      #  bolaDirX = bolaDirX * -1
-
-    # Colisão no lado direito
-    if bola.right >= (LARGURA_TELA - LARGURA_LINHA):
-        bola.x = (LARGURA_TELA - (LARGURA_LINHA * 2)) - vel_x
+def verifica_colisao(bola, bolaDirX, bolaDirY):
+    if bola.top == LARGURA_LINHA or bola.bottom == (ALTURA_TELA - LARGURA_LINHA):
+        bolaDirY = bolaDirY * -1
+    if bola.left == LARGURA_LINHA or bola.right == (LARGURA_TELA - LARGURA_LINHA):
         bolaDirX = bolaDirX * -1
-
-    # Colisão na linha superior
-    if bola.top <= (LARGURA_LINHA):
-       bola.y = LARGURA_LINHA + (vel_y * -1)
-       bolaDirY = bolaDirY * -1
-
-    # Colisão na linha inferior
-    #elif bola.bottom >= (ALTURA_TELA - LARGURA_LINHA):
-     #   bola.y = (ALTURA_TELA - (LARGURA_LINHA * 2)) - vel_y
-      #  bolaDirY = bolaDirY * -1
-
-
     return bolaDirX, bolaDirY
 
 
 # Verifica a colisão da bola com a paleta1 ou paleta2
 def verifica_colisao_paletas(bola, paleta1, paleta2, bolaDirX):
-    if bolaDirX <= -1 and bola.left <= paleta1.right and bola.top >= paleta1.top and bola.bottom <= paleta1.bottom:
-        bola.x = paleta1.right
-        return bolaDirX * -1
-    # Paleta DIREITA
-    elif bolaDirX >= 1 and bola.right >= paleta2.left and bola.top >= paleta2.top and bola.bottom <= paleta2.bottom:
-        bola.x = paleta2.left - LARGURA_LINHA
-        return bolaDirX * -1
+    if bolaDirX == -1 and paleta1.right == bola.left and paleta1.top <= bola.top and paleta1.bottom >= bola.bottom:
+        return -1
+    elif bolaDirX == 1 and paleta2.left == bola.right and paleta2.top <= bola.top and paleta2.bottom >= bola.bottom:
+        return -1
     else:
-        return bolaDirX
+        return 1
 
 
 def paleta_bot(bola, bolaDirX, paleta2):
@@ -126,18 +94,18 @@ def paleta_bot(bola, bolaDirX, paleta2):
     return paleta2
 
 
-def paleta_double_bot(bola, bolaDirX, paleta1, paleta2, velocidade):
+def paleta_double_bot(bola, bolaDirX, paleta1, paleta2):
     # Movimentar a paleta quando a bola vem em direção da paleta
     if bolaDirX == 1:
-        if paleta2.centery <= bola.centery:
-            paleta2.y += 1 + velocidade
+        if paleta2.centery < bola.centery:
+            paleta2.y += 1
         else:
-            paleta2.y -= 1 + velocidade
+            paleta2.y -= 1
     if bolaDirX == -1:
-        if paleta1.centery <= bola.centery:
-            paleta1.y += 1 + velocidade
+        if paleta1.centery < bola.centery:
+            paleta1.y += 1
         else:
-            paleta1.y -= 1 + velocidade
+            paleta1.y -= 1
     return paleta1, paleta2
 
 
@@ -243,9 +211,6 @@ def main():
     desenha_bola(bola)
 
     placar_anterior = 0
-
-    acelerador = [0, 0]
-    velocidade = 1
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -272,13 +237,13 @@ def main():
         desenha_paleta(paleta2)
         desenha_bola(bola)
 
-        bola = movimento_bola(bola, bolaDirX, bolaDirY, acelerador)
+        bola = movimento_bola(bola, bolaDirX, bolaDirY)
 
-        bolaDirX, bolaDirY = verifica_colisao(bola, bolaDirX, bolaDirY, acelerador)
+        bolaDirX, bolaDirY = verifica_colisao(bola, bolaDirX, bolaDirY)
         bolaDirX = bolaDirX * verifica_colisao_paletas(bola, paleta1, paleta2, bolaDirX)
 
         if JOGADOR == 0:
-            paleta1, paleta2 = paleta_double_bot(bola, bolaDirX, paleta1, paleta2, velocidade)
+            paleta1, paleta2 = paleta_double_bot(bola, bolaDirX, paleta1, paleta2)
         if JOGADOR == 1:
             paleta2 = paleta_bot(bola, bolaDirX, paleta2)
 
@@ -289,25 +254,17 @@ def main():
             placar_left, placar_right = verifica_placar(paleta1, paleta2, bola, placar_left, placar_right, bolaDirX)
 
         desenha_placar(placar_left, placar_right)
-        if bolaDirX > 0:
-            acelerador[0] = velocidade * 1
-        else:
-            acelerador[0] = velocidade * -1
-        if bolaDirY > 0:
-            acelerador[1] = velocidade * 1
-        else:
-            acelerador[1] = velocidade * -1
-
-        # Aumentar 1 na velocidade, a cada 10 pontos do jogador da esquerda.
         multiplo_10 = placar_left % 2 == 0
         placar_atual = placar_left
+
         if multiplo_10 and placar_atual != placar_anterior:
             placar_anterior = placar_left
-            controle_velocidade(velocidade)
+            FPS += 100
             placar_atual = placar_left
-
         pygame.display.update()
         FPSCLOCK.tick(FPS)
+
+        print(FPS)
 
 
 if __name__ == '__main__':
