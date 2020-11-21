@@ -54,3 +54,22 @@ def inicializa_matriz_pos():
             lista_posicoes[i][j] = (x, y, "", True)
             print(lista_posicoes[i], [j])
     return lista_posicoes
+
+
+# Função principal
+def main():
+
+    fim_da_partida = False
+    while not fim_da_partida:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+
+        win.fill(BRANCO)
+        desenha_tabuleiro()
+        pygame.display.update()
+
+
+while True:
+    if __name__ == '__main__':
+        main()
