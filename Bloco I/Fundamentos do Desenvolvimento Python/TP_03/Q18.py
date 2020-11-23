@@ -119,7 +119,7 @@ def verifica_placar(paleta1, paleta2, bola, placar_left, placar_right, bolaDirX,
             return 0
         elif bolaDirX == 1 and paleta1.right == bola.left and paleta1.top < bola.top and paleta1.bottom > bola.bottom:
             # Apenas aumentar a pontuação se a velocidade houver sido aumentada 2x.
-            if velocidade_aplicada % 2 == 0:
+            if velocidade_aplicada > 0:
                 pontuacao = 1 + velocidade_aplicada // 2
                 placar_left += pontuacao
             else:
@@ -147,7 +147,7 @@ def verifica_placar(paleta1, paleta2, bola, placar_left, placar_right, bolaDirX,
         # Se a bola encostar na paleta do lado esquerdo, soma +1 ponto.
         elif bolaDirX == 1 and paleta1.right == bola.left and paleta1.top <= bola.top and paleta1.bottom >= bola.bottom:
             # Apenas aumentar a pontuação se a velocidade houver sido aumentada 2x.
-            if velocidade_aplicada % 2 == 0:
+            if velocidade_aplicada > 0:
                 pontuacao = 1 + velocidade_aplicada // 2
                 placar_left += pontuacao
             else:
