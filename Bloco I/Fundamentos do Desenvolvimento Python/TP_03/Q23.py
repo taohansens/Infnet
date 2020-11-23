@@ -1,3 +1,12 @@
+"""
+Q.23
+(Desafio) Usando a biblioteca Pygame, escreva um programa que implemente o jogo da velha para dois jogadores
+(ambos usuários). (código e printscreen)
+
+# Reaproveitado código já realizado também em Java:
+# em: https://github.com/taohansens/JogoDaVelha
+"""
+
 import sys
 
 import pygame
