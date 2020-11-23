@@ -12,3 +12,7 @@
 > O arquivo "ball_fail.wav", é o arquivo integral retirado de https://freesound.org/s/404743/
 > criado pelo usuário OwlStorm que está disponibilizado sob licença Attribution-NonCommercial
 > 3.0 Unported (CC BY-NC 3.0) 
+
+> O arquivo "ball_ten.wav", é uma edição de parte arquivo retirado de https://freesound.org/s/518305/
+> criado pelo usuário Mrthenoronha que está disponibilizado sob licença Attribution-NonCommercial
+> 3.0 Unported (CC BY-NC 3.0) 
