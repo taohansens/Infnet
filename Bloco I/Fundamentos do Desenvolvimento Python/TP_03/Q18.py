@@ -204,8 +204,8 @@ def main():
     jogadorDois_posicao = (ALTURA_TELA - PALETA_TAMANHO) // 2
 
     # Placar
-    placar_left = 8
-    placar_right = 8
+    placar_left = 0
+    placar_right = 0
 
     # Altera posição da bola
     bolaDirX = -1
