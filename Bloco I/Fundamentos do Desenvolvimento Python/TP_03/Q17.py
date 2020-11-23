@@ -256,7 +256,7 @@ def main():
             placar_left, placar_right = verifica_placar(paleta1, paleta2, bola, placar_left, placar_right, bolaDirX)
 
         desenha_placar(placar_left, placar_right)
-        multiplo_10 = placar_left % 2 == 0
+        multiplo_10 = placar_left % 10 == 0
         placar_atual = placar_left
 
         # Lógica para aumentar velocidade do jogo
