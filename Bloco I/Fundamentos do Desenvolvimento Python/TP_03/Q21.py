@@ -12,7 +12,7 @@ from pygame.locals import *
 # SE jogador == 0, será bot x bot.
 # SE jogador == 1, será player x bot.
 # SE jogador == 2, player x player.
-# Alterado para player x player para verificação dos sons
+
 JOGADOR = 1
 
 # CONSTANTES
