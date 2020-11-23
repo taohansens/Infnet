@@ -76,8 +76,12 @@ def verifica_colisao(bola, bolaDirX, bolaDirY):
 # Verifica a colisão da bola com a paleta1 ou paleta2
 def verifica_colisao_paletas(bola, paleta1, paleta2, bolaDirX):
     if bolaDirX == -1 and paleta1.right == bola.left and paleta1.top <= bola.top and paleta1.bottom >= bola.bottom:
+        # Se colidir, além de mudar a trajetória, irá execurar o som.
+        audio_paleta.play()
         return -1
     elif bolaDirX == 1 and paleta2.left == bola.right and paleta2.top <= bola.top and paleta2.bottom >= bola.bottom:
+        # Se colidir, além de mudar a trajetória, irá execurar o som.
+        audio_paleta.play()
         return -1
     else:
         return 1
@@ -178,6 +182,13 @@ def desenha_placar(placar_left, placar_right):
         DISPLAYSURF.blit(resultadoSurf2, resultadoRect2)
 
 
+# Função que executará o áudio da paleta.
+def configuracao_som():
+    global audio_paleta
+    audio_paleta = pygame.mixer.Sound("resources/ball_paletas.wav")
+    audio_paleta.set_volume(0.50)
+
+
 def main():
     pygame.init()
     # FPS
@@ -225,6 +236,9 @@ def main():
 
     # Controle de vezes que aumentou a velocidade para adicionar ao placar esquerdo
     velocidade_vezes = 0
+
+    # Configuração do Som
+    configuracao_som()
 
     while True:
         for event in pygame.event.get():
