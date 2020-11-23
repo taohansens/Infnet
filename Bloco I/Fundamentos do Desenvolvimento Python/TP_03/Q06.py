@@ -3,6 +3,9 @@ Q6. Escreva um programa em Python que leia diversas frases até a palavra “Sai
 Indique quais frases apresentam a palavra “eu”. (código)
 """
 
+# Utilizando regular expressions para regex.
+import re
+
 # Cria a lista para armazanar as frases
 lista_frases = []
 
@@ -17,8 +20,8 @@ def verifica_eu(vetor):
     # se não existir frase com "eu" continuará False.
     existe = False
     for ver_frase in vetor:
-        # verifica a existência da string "eu" na frase // convertido para lower, para não haver difirenças.
-        if "eu" in ver_frase.lower():
+        # verifica a existência da string "eu" na frase // convertido para lower, para não haver diferenças.
+        if re.search(r'\beu\b', ver_frase.lower()):
             # se existir frase com "eu" se tornará True.
             existe = True
             # imprime a frase encontrada
