@@ -13,7 +13,8 @@ from pygame.locals import *
 # SE jogador == 0, será bot x bot.
 # SE jogador == 1, será player x bot.
 # SE jogador == 2, player x player.
-JOGADOR = 0
+# Alterado para player x player para verificação dos sons
+JOGADOR = 2
 
 # CONSTANTES
 
@@ -128,6 +129,8 @@ def verifica_placar(paleta1, paleta2, bola, placar_left, placar_right, bolaDirX,
                 placar_left += 1
             return placar_left
         elif bola.right == LARGURA_TELA - LARGURA_LINHA:
+            # Áudio de vitória apenas para o jogador da esquerda
+            audio_win.play()
             placar_left += 10
             return placar_left
         else:
@@ -136,12 +139,16 @@ def verifica_placar(paleta1, paleta2, bola, placar_left, placar_right, bolaDirX,
     if JOGADOR == 0 or JOGADOR == 2:
         # Se a bola passar da paleta esquerda, zera seu placar e soma 10 ao adversario.
         if bola.left == LARGURA_LINHA:
+            # Áudio de vitória para os dois lados.
+            audio_win.play()
             placar_left = 0
             placar_right += 10
             return placar_left, placar_right
 
         # Se a bola passar da paleta direita, zera seu placar.
         if bola.right == LARGURA_TELA - LARGURA_LINHA:
+            # Áudio de vitória para os dois lados.
+            audio_win.play()
             placar_right = 0
             placar_left += 10
             return placar_left, placar_right
@@ -187,14 +194,17 @@ def desenha_placar(placar_left, placar_right):
 # Função que executará o áudio da paleta.
 def configuracao_som():
     global audio_paleta
+    global audio_win
+    audio_win = pygame.mixer.Sound("resources/ball_vitoria.wav")
     audio_paleta = pygame.mixer.Sound("resources/ball_paletas.wav")
     audio_paleta.set_volume(0.50)
+    audio_win.set_volume(0.50)
 
 
 def main():
     pygame.init()
     # FPS
-    FPS = 120
+    FPS = 200
     global DISPLAYSURF
     # Informações sobre a fonte do placar
     global BASICFONT, BASICFONTSIZE
