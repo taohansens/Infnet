@@ -295,6 +295,10 @@ def main():
             placar_left, placar_right = verifica_placar(paleta1, paleta2, bola, placar_left, placar_right, bolaDirX,
                                                         velocidade_vezes)
 
+        # Se bater, zerar o aumento de velocidade
+        if placar_left == 0:
+            velocidade_vezes = 0
+
         desenha_placar(placar_left, placar_right)
         multiplo_10 = placar_left % 10 == 0
         placar_atual = placar_left
