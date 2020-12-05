@@ -1,11 +1,12 @@
 # Importação de bibliotecas
-import pygame
 import platform
-import psutil
-import cpuinfo
 import re
-from urllib.request import urlopen
 import sys
+import cpuinfo
+from urllib.request import urlopen
+
+import psutil
+import pygame
 from pygame.locals import *
 
 # INICIA PYGAME
@@ -18,6 +19,7 @@ pygame.font.init()
 FONTE_TITLE = pygame.font.SysFont("segoe-ui-bold", 60)
 FONTE_INFO = pygame.font.SysFont("segoe-ui", 18)
 FONTE_INFO_BOLD = pygame.font.SysFont("segoe-ui-bold", 26)
+FONTE_SUBINFO_BOLD = pygame.font.SysFont("segoe-ui-bold", 20)
 FONTE_PERCENT = pygame.font.SysFont("segoe", 26)
 FONTE_PERCENT_PROC = pygame.font.SysFont("segoe", 20)
 
@@ -41,6 +43,8 @@ TAM_SETA = (LARGURA_TELA, 100)
 
 ESPESSURA_BARRA = 14
 
+info_cpu = cpuinfo.get_cpu_info()
+
 
 # Processador
 def processador():
@@ -53,21 +57,24 @@ def processador():
     # Textos Info processador
     # Título
     titulo = FONTE_TITLE.render("Uso do Processador", True, ESCURO)
-    surface_02.blit(titulo, (70, 20))
+    surface_02.blit(titulo, (40, 20))
     # Informações
-    processor_name = "{}".format(platform.processor())
+    processor_name = "{}".format(info_cpu['brand_raw'])
     sistema_op = "SO: {} ({})".format(platform.system(), platform.platform())
-    processor_cores = "Clock: {} GHz, Arquitetura ({})".format(psutil.cpu_freq().current/1000, platform.architecture()[0])
+    processor_cores = "Clock: {} GHz | Palavra: {} bits | Arch: {}".format(psutil.cpu_freq().current/1000, info_cpu['bits'], info_cpu['arch'])
+    freq_info = "Frequência: {}Mhz / {}Mhz".format(psutil.cpu_freq().current, psutil.cpu_freq().max)
     processor_cores_obj = FONTE_INFO.render(processor_cores, True, ESCURO)
     sistema_op_obj = FONTE_INFO.render(sistema_op, True, ESCURO)
     processor_name_obj = FONTE_INFO.render(processor_name, True, ESCURO)
-    surface_02.blit(processor_name_obj, (70, pos_altura_barra + 20))
-    surface_02.blit(processor_cores_obj, (70, pos_altura_barra + 45))
-    surface_02.blit(sistema_op_obj, (70, pos_altura_barra + 70))
+    freq_info_obj = FONTE_INFO.render(freq_info, True, ESCURO)
+    surface_02.blit(processor_name_obj, (40, pos_altura_barra + 20))
+    surface_02.blit(processor_cores_obj, (40, pos_altura_barra + 45))
+    surface_02.blit(sistema_op_obj, (40, pos_altura_barra + 70))
+    surface_02.blit(freq_info_obj, (40, pos_altura_barra + 92))
 
-    qtd_nucleos = "{} núcleos".format(psutil.cpu_count())
+    qtd_nucleos = "{} threads | {} núcleos".format(psutil.cpu_count(),  psutil.cpu_count(logical=False))
     qtd_nucleos_obj = FONTE_INFO_BOLD.render(qtd_nucleos, True, ESCURO)
-    surface_02.blit(qtd_nucleos_obj, (250, 170))
+    surface_02.blit(qtd_nucleos_obj, (210, 175))
 
     # Laço sobre todas os núcleos.
     var_barra = 0
@@ -103,7 +110,7 @@ def memoria_ram():
 
     titulo = FONTE_TITLE.render("Uso Memória RAM", True, ESCURO)
     percentagem_uso = FONTE_PERCENT.render(perc_texto, True, ESCURO)
-    surface_01.blit(titulo, (70, 20))
+    surface_01.blit(titulo, (40, 20))
     surface_01.blit(percentagem_uso, (15, pos_altura_barra))
 
     # Memoria total
@@ -138,7 +145,7 @@ def disco():
 
     titulo = FONTE_TITLE.render("Espaço Total em Disco", True, ESCURO)
     percentagem_uso = FONTE_PERCENT.render(perc_texto, True, ESCURO)
-    surface_03.blit(titulo, (70, 20))
+    surface_03.blit(titulo, (40, 20))
     surface_03.blit(percentagem_uso, (15, pos_altura_barra))
 
     # Espaço total
@@ -176,11 +183,59 @@ def rede(ip_pub):
     ip_pub_obj = FONTE_TITLE.render(ip_public, True, ESCURO)
     surface_04 = pygame.Surface(TAM_TELA)
     surface_04.fill(CINZA)
-    surface_04.blit(ip_local_obj, (70, 160))
-    surface_04.blit(ip_pub_obj, (70, 200))
-    surface_04.blit(ip_netmask_obj, (70, 250))
+    titulo = FONTE_TITLE.render("Informações de Rede", True, ESCURO)
+    surface_04.blit(titulo, (40, 20))
+    surface_04.blit(ip_local_obj, (20, 200))
+    surface_04.blit(ip_pub_obj, (20, 240))
+    surface_04.blit(ip_netmask_obj, (20, 290))
 
     TELA.blit(surface_04, (0, 0))
+
+
+def resumo():
+    surface_05 = pygame.Surface(TAM_TELA)
+    surface_05.fill(CINZA)
+    pos_altura_barra = 75
+
+    # Título
+    titulo = FONTE_TITLE.render("Resumo de Informações", True, ESCURO)
+    surface_05.blit(titulo, (40, 20))
+
+    # Processador
+    titulo = FONTE_SUBINFO_BOLD.render("Processador", True, ESCURO)
+    surface_05.blit(titulo, (40, 80))
+    processor_name = "{}".format(info_cpu['brand_raw'])
+    sistema_op = "SO: {} ({})".format(platform.system(), platform.platform())
+    processor_cores = "Clock: {} GHz | Palavra: {} bits | Arch: {}".format(psutil.cpu_freq().current / 1000,
+                                                                           info_cpu['bits'], info_cpu['arch'])
+    freq_info = "Frequência: {}Mhz / {}Mhz".format(psutil.cpu_freq().current, psutil.cpu_freq().max)
+    processor_cores_obj = FONTE_INFO.render(processor_cores, True, ESCURO)
+    sistema_op_obj = FONTE_INFO.render(sistema_op, True, ESCURO)
+    processor_name_obj = FONTE_INFO.render(processor_name, True, ESCURO)
+    freq_info_obj = FONTE_INFO.render(freq_info, True, ESCURO)
+    surface_05.blit(processor_name_obj, (40, pos_altura_barra + 20))
+    surface_05.blit(processor_cores_obj, (40, pos_altura_barra + 45))
+    surface_05.blit(sistema_op_obj, (40, pos_altura_barra + 70))
+    surface_05.blit(freq_info_obj, (40, pos_altura_barra + 92))
+
+    qtd_nucleos = "{} threads | {} núcleos".format(psutil.cpu_count(), psutil.cpu_count(logical=False))
+    qtd_nucleos_obj = FONTE_INFO.render(qtd_nucleos, True, ESCURO)
+    surface_05.blit(qtd_nucleos_obj, (410, 100))
+
+    uso_cpu = psutil.cpu_percent(interval=0)
+
+    perc_texto = "{}%".format(uso_cpu)
+    titulo = FONTE_PERCENT.render("Uso do Processador", True, ESCURO)
+    percentagem_uso = FONTE_PERCENT.render(perc_texto, True, ESCURO)
+    surface_05.blit(titulo, (410, 85))
+    surface_05.blit(percentagem_uso, (460, 130))
+
+    # Desenha barra total (em azul)
+    pygame.draw.rect(surface_05, AZUL, (430, 150, 100, ESPESSURA_BARRA))
+    # Barra de uso (em vermelho)
+    pos_final_barra_uso = 100 * (uso_cpu / 100)
+    pygame.draw.rect(surface_05, VERMELHO, (430, 150, pos_final_barra_uso, ESPESSURA_BARRA))
+    TELA.blit(surface_05, (0,0))
 
 
 # Verifica todos os discos do usuario:
@@ -268,7 +323,7 @@ def main():
                     if pagina > 0:
                         pagina -= 1
                 if event.key == pygame.K_RIGHT:
-                    if pagina < 4:
+                    if pagina < 5:
                             pagina += 1
         if controle == 60:
             controle_setas()
@@ -280,6 +335,8 @@ def main():
                 disco()
             if pagina == 3:
                 rede(ip_publico())
+            if pagina == 4:
+                resumo()
             controle = 0
         pygame.display.update()
         controle += 1
