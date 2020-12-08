@@ -60,6 +60,7 @@ Circulo(*posicao_atual)
 while not terminou:
     pygame.display.update()
     botao = Circulo(posicao_atual[0], posicao_atual[1])
+    checa_colisao(botao.area)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -79,6 +80,15 @@ while not terminou:
                 posicao_atual[0] += 20
             if event.key == pygame.K_LEFT or event.key == pygame.K_a:
                 posicao_atual[0] -= 20
+            # Controle do limite da tela, reaparecer na extremidade contrária.
+            if posicao_atual[0] > largura_tela:
+                posicao_atual[0] = 0
+            if posicao_atual[0] < 0:
+                posicao_atual[0] = largura_tela
+            if posicao_atual[1] > altura_tela:
+                posicao_atual[1] = 0
+            if posicao_atual[1] < 0:
+                posicao_atual[1] = altura_tela
 
     if len(retangulos) >= 0:
         tela.fill(branco)
