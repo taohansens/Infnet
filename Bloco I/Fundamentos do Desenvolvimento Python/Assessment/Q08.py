@@ -1,9 +1,10 @@
 """
-Q.11. Usando a biblioteca Pygame, escreva um programa que possui uma função que desenha um círculo azul de 100 px de
-diâmetro no centro da tela que se move da esquerda para a direita. Sempre que chegar na extremidade direita, o círculo
-deve voltar à extremidade esquerda, retomando o movimento da esquerda para a direita. (código e printscreen)
-## Animação armazenada em ./Q11 (circulo_mov_tela).gif
+Q.08. Usando a biblioteca ‘pygame’, escreva um programa que desenha um botão (círculo) com o texto “clique” sobre ele
+na parte superior da tela. Quando o botão for clicado, ele deve chamar uma função que desenha um retângulo em uma
+posição aleatória na tela. Caso um retângulo apareça na mesma posição que um já existente, ambos devem ser eliminados.
+## Animação armazenada em ./Q08.gif
 """
+
 import random
 
 import pygame
@@ -25,13 +26,16 @@ VERMELHO = (231, 76, 60)
 tela.fill(branco)
 
 
-# Função para desenhar círculo azuç com  50px de raio.
-def desenha_circulo_azul(x, y):
-    global texto_rect
-    circulo = pygame.draw.circle(tela, azul, (x, y), 50)
-    texto = FONTE.render("Clique", True, branco)
-    texto_rect = texto.get_rect(center=circulo.center)
-    tela.blit(texto, texto_rect)
+class Circulo:
+    def __init__(self, x, y):
+        self.raio = 50
+        self.area = pygame.Rect(x, y, self.raio*2, self.raio*2)
+
+    def desenha(self):
+        pygame.draw.ellipse(tela, azul, self.area)
+        texto = FONTE.render("Clique", True, branco)
+        button_text_rect = texto.get_rect(center=self.area.center)
+        tela.blit(texto, button_text_rect)
 
 
 class Retangulo:
@@ -51,29 +55,26 @@ def checa_colisao(novo_ret):
 
 
 retangulos = []
-
 terminou = False
 while not terminou:
     pygame.display.update()
-    # Terminar programa se Quit.
+    botao = Circulo(largura_tela // 2 - 50, 10)
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             terminou = True
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             pos = pygame.mouse.get_pos()
-            if texto_rect.collidepoint(pos):
+            if botao.area.collidepoint(pos):
                 r = Retangulo()
                 retangulos.append(r.area)
                 checa_colisao(r.area)
-                print("{} \n {} - {}".format(r.area, len(retangulos), retangulos))
 
     if len(retangulos) > 0:
         tela.fill(branco)
         for ret in retangulos:
             pygame.draw.rect(tela, VERMELHO, ret)
-    desenha_circulo_azul(largura_tela / 2, 60)
-    pygame.display.update()
-
+    botao.desenha()
 
 pygame.display.quit()
 pygame.quit()
