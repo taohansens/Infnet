@@ -12,7 +12,7 @@
         <h1>Listagem de arquivos</h1>
     </div>
     <div class="row1">
-        <div class="table-success"><h6>{{ pasta }}</h6></div>
+        <h6>Diretório: {{ pasta }}</h6>
     </div>
     <table class="table table-striped table-hover">
         <thead class="thead-dark">
@@ -33,19 +33,13 @@
                     <td>{{ item.atime }}</td>
                 </tr>
             {% endfor %}
-            </tbody>
-            </table>
-            <div class="row">
-
-            <ul>
-
-
-            </ul>
         {% else %}
-            <p>Pasta vazia.</p>
+            <tr>
+            <td>Pasta vazia.</td>
+            </tr>
         {% endif %}
-        </div>
-</div>
+        </tbody>
+    </table>
 </div>
 </body>
 </html>
