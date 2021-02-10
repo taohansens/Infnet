@@ -4,6 +4,7 @@ import os
 # Para timestamp
 from datetime import datetime
 from dateutil import tz
+import time
 
 # breakline
 br = '\n===================='
@@ -82,22 +83,33 @@ def timestamp(file):
     return atime, mtime
 
 
+# Calculando tempo de execução
+inicio_exec = datetime.now()
+
 # Imprimindo lista de arquivos da pasta downloads
 my_folder = '../../../../Downloads'
 l_arquivos = os.listdir(my_folder)
 if os.path.exists(my_folder):
     for arquivo in l_arquivos:
+        # time.sleep(1)
         caminho_arquivo = os.path.join(my_folder, arquivo)
         if os.path.isfile(caminho_arquivo):
             arquivo_stat = os.stat(caminho_arquivo)
-            time = timestamp(caminho_arquivo)
-            #print(arquivo, f"{arquivo_stat.st_size//1024}KB", arquivo_stat.st_uid, time[0], time[1])
-            print('{0: <75}'.format(arquivo), "|", '{0: <20}'.format(time[0]), "|",'{0: <20}'.format(time[1]))
+            timestamp_GMT = timestamp(caminho_arquivo)
+            # print(arquivo, f"{arquivo_stat.st_size//1024}KB", arquivo_stat.st_uid, time[0], time[1])
+            print('{0: <30}'.format(arquivo), "|",
+                  '{0: <20}'.format(f"{arquivo_stat.st_size//1024}KB"), "|",
+                  '{0: <20}'.format(timestamp_GMT[0]), "|",
+                  '{0: <20}'.format(timestamp_GMT[1]))
 
+print(br)
 
+# Calculando tempo de execução
+fim_exec = datetime.now()
+tempo_exec = fim_exec - inicio_exec
+print(f"Tempo de execução: {tempo_exec}")
 
-
-
+print(br)
 
 
 
