@@ -393,7 +393,7 @@ def timestamp_converter(st_time):
 
 
 def listagem_diretorio(diretorio):
-    class InfoArquivos():
+    class InfoArquivos:
         def __init__(self, nome, tamanho, atime, mtime):
             self.nome = nome
             self.tamanho = tamanho
@@ -421,7 +421,7 @@ def listagem_diretorio(diretorio):
     return lista_arquivos, lista_diretorios
 
 
-def print_arquivos(lista):
+def print_arquivos_terminal(lista):
     header = '{:20}'.format("Nome")
     header = header + '{:20}'.format("Tamanho")
     header = header + '{:20}'.format("Data de Mod.")
@@ -435,7 +435,9 @@ def print_arquivos(lista):
         print(file)
 
 
-def arquivos(surface, tipo, l_files):
+def arquivos(tipo, l_files):
+    # Talvez implementar Scroll
+    # https://stackoverflow.com/questions/55319181/how-to-scroll-the-background-surface-in-pygame
     surface = pygame.Surface(TAM_TELA)
     surface.fill(CINZA)
 
@@ -471,11 +473,33 @@ def arquivos(surface, tipo, l_files):
     TELA.blit(surface, (0, 0))
 
 
+def print_processos_terminal(l_process):
+    header = '{:8}'.format("PID")
+    header = header + '{:20}'.format("Nome Processo")
+    header = header + '{:10}'.format("Status")
+    header = header + '{:10}'.format("Memória RSS/VMS")
+    print(header)
+    for process in l_process:
+        info = '{:<8}'.format(process['pid'])
+        info = info + '{:20}'.format(process['name'])
+        info = info + '{:10}'.format(process['status'])
+        info = info + '{:10} | {}'.format(process['memory_info'].rss, process['memory_info'].vms)
+        print(info)
+
+
 def processos():
     l_process = []
     for item in psutil.process_iter():
         l_process.append(item.as_dict(attrs=['pid', 'name', 'status', 'cpu_times', 'memory_info']))
-    print(l_process)
+    surface = pygame.Surface(TAM_TELA)
+    surface.fill(CINZA)
+    titulo = FONTE_TITLE.render("Processos em execução", True, ESCURO)
+    surface.blit(titulo, (40, 20))
+    info = FONTE_INFO_BOLD.render(f"{len(l_process)} Processos listados no terminal.", True, ESCURO)
+    surface.blit(info, (40, 120))
+    TELA.blit(surface, (0, 0))
+
+    return l_process
 
 
 def controle_setas():
@@ -554,17 +578,19 @@ def main():
             if pagina == 5:
                 lista = listagem_diretorio(os.environ['HOMEPATH'])[0]
                 if not printed:
-                    print_arquivos(lista)
+                    print_arquivos_terminal(lista)
                     printed = True
-                arquivos('surface_06', "Arquivos", lista)
+                arquivos("Arquivos", lista)
             if pagina == 6:
                 lista = listagem_diretorio(os.environ['HOMEPATH'])[1]
                 if printed:
-                    print_arquivos(lista)
+                    print_arquivos_terminal(lista)
                     printed = False
-                arquivos('surface_07', "Pastas", lista)
+                arquivos("Pastas", lista)
             if pagina == 7:
-                processos()
+                if not printed:
+                    print_processos_terminal(processos())
+                    printed = True
             controle = 0
         pygame.display.update()
         controle += 1
