@@ -41,7 +41,6 @@ VERMELHO = (231, 76, 60)
 AZUL = (52, 152, 219)
 BRANCO = (255, 255, 255)
 
-
 # CONSTANTES COM O TAMANHO DA TELA
 TAM_TELA = (LARGURA_TELA, 500)
 TAM_SETA = (LARGURA_TELA, 100)
@@ -68,7 +67,8 @@ def processador():
     # Informações
     processor_name = "{}".format(info_cpu['brand_raw'])
     sistema_op = "SO: {} ({})".format(platform.system(), platform.platform())
-    processor_cores = "Clock: {} GHz | Palavra: {} bits | Arch: {}".format(psutil.cpu_freq().current/1000, info_cpu['bits'], info_cpu['arch'])
+    processor_cores = "Clock: {} GHz | Palavra: {} bits | Arch: {}".format(psutil.cpu_freq().current / 1000,
+                                                                           info_cpu['bits'], info_cpu['arch'])
     freq_info = "Frequência: {}Mhz / {}Mhz".format(psutil.cpu_freq().current, psutil.cpu_freq().max)
     processor_cores_obj = FONTE_INFO.render(processor_cores, True, ESCURO)
     sistema_op_obj = FONTE_INFO.render(sistema_op, True, ESCURO)
@@ -79,7 +79,7 @@ def processador():
     surface_02.blit(sistema_op_obj, (40, pos_altura_barra + 70))
     surface_02.blit(freq_info_obj, (40, pos_altura_barra + 92))
 
-    qtd_nucleos = "{} threads | {} núcleos".format(psutil.cpu_count(),  psutil.cpu_count(logical=False))
+    qtd_nucleos = "{} threads | {} núcleos".format(psutil.cpu_count(), psutil.cpu_count(logical=False))
     qtd_nucleos_obj = FONTE_INFO_BOLD.render(qtd_nucleos, True, ESCURO)
     surface_02.blit(qtd_nucleos_obj, (210, 175))
 
@@ -97,6 +97,7 @@ def processador():
         pygame.draw.rect(surface_02, VERMELHO, (60, 200 + var_barra, pos_final_barra_uso, ESPESSURA_BARRA))
         var_barra += 25
     TELA.blit(surface_02, (0, 0))
+
 
 # ************************************************************ #
 #                      Memória RAM
@@ -350,7 +351,7 @@ def resumo():
     surface_05.blit(ip_netmask_obj, (40, 460))
     # ************************************************************ #
 
-    TELA.blit(surface_05, (0,0))
+    TELA.blit(surface_05, (0, 0))
 
 
 # Verifica todos os discos do usuario:
@@ -379,7 +380,7 @@ def verifica_discos():
 
     string_discos = ""
     for i in range(len(discos)):
-        string_discos += discos[i]+" "
+        string_discos += discos[i] + " "
 
     # Calcula a porcentagem do uso total.
     percent_usado = round(espaco_usado / espaco_total * 100, 1)
@@ -409,7 +410,7 @@ def listagem_diretorio(diretorio):
             arquivo_stat = os.stat(caminho_arquivo)
             tamanho = f"{arquivo_stat.st_size // 1024} KB"
             instFile = InfoArquivos(arquivo, tamanho, timestamp_converter(os.stat(caminho_arquivo).st_atime),
-                                timestamp_converter(os.stat(caminho_arquivo).st_mtime))
+                                    timestamp_converter(os.stat(caminho_arquivo).st_mtime))
             if os.path.isfile(caminho_arquivo):
                 lista_arquivos.append(instFile)
             elif os.path.isdir(caminho_arquivo):
@@ -420,51 +421,61 @@ def listagem_diretorio(diretorio):
     return lista_arquivos, lista_diretorios
 
 
-def arquivos():
-    listagem_diretorio(os.environ['HOMEPATH'])
-    surface_06 = pygame.Surface(TAM_TELA)
-    surface_06.fill(CINZA)
+def print_arquivos(lista):
+    header = '{:20}'.format("Nome")
+    header = header + '{:20}'.format("Tamanho")
+    header = header + '{:20}'.format("Data de Mod.")
+    header = header + '{:20}'.format("Data de Cri.")
+    print(header)
+    for arquivo in lista:
+        file = '{:20.20}'.format(arquivo.nome)
+        file = file + '{0:20}'.format(arquivo.tamanho)
+        file = file + '{:10}'.format(arquivo.atime)
+        file = file + '{:>20}'.format(arquivo.mtime)
+        print(file)
+
+
+def arquivos(surface, tipo, l_files):
+    surface = pygame.Surface(TAM_TELA)
+    surface.fill(CINZA)
+
     # Posições em pixels
     pos_altura_barra = 50
 
     # Textos Info processador
     # Título
-    titulo = FONTE_TITLE.render("Listagem da pasta:", True, ESCURO)
-    subtitulo = FONTE_SUBINFO_BOLD.render(os.environ['HOMEPATH'], True, ESCURO)
+    titulo = FONTE_TITLE.render(f"Listagem de {tipo}", True, ESCURO)
+    subtitulo = FONTE_SUBINFO_BOLD.render(f"Diretório: {os.environ['HOMEPATH']}", True, ESCURO)
 
-    surface_06.blit(titulo, (40, 20))
-    # Informações
-    processor_name = "{}".format(info_cpu['brand_raw'])
-    sistema_op = "SO: {} ({})".format(platform.system(), platform.platform())
-    processor_cores = "Clock: {} GHz | Palavra: {} bits | Arch: {}".format(psutil.cpu_freq().current/1000, info_cpu['bits'], info_cpu['arch'])
-    freq_info = "Frequência: {}Mhz / {}Mhz".format(psutil.cpu_freq().current, psutil.cpu_freq().max)
-    processor_cores_obj = FONTE_INFO.render(processor_cores, True, ESCURO)
-    sistema_op_obj = FONTE_INFO.render(sistema_op, True, ESCURO)
-    processor_name_obj = FONTE_INFO.render(processor_name, True, ESCURO)
-    freq_info_obj = FONTE_INFO.render(freq_info, True, ESCURO)
-    surface_06.blit(processor_name_obj, (40, pos_altura_barra + 20))
-    surface_06.blit(processor_cores_obj, (40, pos_altura_barra + 45))
-    surface_06.blit(sistema_op_obj, (40, pos_altura_barra + 70))
-    surface_06.blit(freq_info_obj, (40, pos_altura_barra + 92))
+    surface.blit(titulo, (40, 20))
+    surface.blit(subtitulo, (40, 70))
 
-    qtd_nucleos = "{} threads | {} núcleos".format(psutil.cpu_count(),  psutil.cpu_count(logical=False))
-    qtd_nucleos_obj = FONTE_INFO_BOLD.render(qtd_nucleos, True, ESCURO)
-    surface_06.blit(qtd_nucleos_obj, (210, 175))
+    header = '{:20}'.format("Nome")
+    header = header + '{:20}'.format("Tamanho")
+    header = header + '{:25}'.format("Data de Mod.")
+    header = header + '{:>25}'.format("Data de Cri.")
 
-    # Laço sobre todas os núcleos.
-    var_barra = 0
-    pos_final_barra = int(LARGURA_TELA - LARGURA_TELA * 0.15)
-    for i in range(1):
-        # texto da % de cada processador.
-        perc_texto = "{}%".format(i)
-        percentagem_uso = FONTE_PERCENT_PROC.render(perc_texto, True, ESCURO)
-        surface_06.blit(percentagem_uso, (15, 200 + var_barra))
+    header_table = FONTE_SUBINFO_BOLD.render(header, True, ESCURO)
+    surface.blit(header_table, (60, pos_altura_barra + 50))
 
-        pygame.draw.rect(surface_06, AZUL, (60, 200 + var_barra, pos_final_barra, ESPESSURA_BARRA))
-        pos_final_barra_uso = pos_final_barra * (i / 100)
-        pygame.draw.rect(surface_06, VERMELHO, (60, 200 + var_barra, pos_final_barra_uso, ESPESSURA_BARRA))
-        var_barra += 25
-    TELA.blit(surface_06, (0, 0))
+    # impressão de arquivos
+    distancia_px = 10
+    for arquivo in l_files:
+        distancia_px += 20
+        file = '{:10.10}'.format(arquivo.nome)
+        file = file + '{0:^30}'.format(arquivo.tamanho)
+        file = file + '{0:20}'.format(arquivo.atime)
+        file = file + '{:>10}'.format(arquivo.mtime)
+        ls_arquivo = FONTE_INFO.render(file, True, ESCURO)
+        surface.blit(ls_arquivo, (40, 90 + distancia_px))
+    TELA.blit(surface, (0, 0))
+
+
+def processos():
+    l_process = []
+    for item in psutil.process_iter():
+        l_process.append(item.as_dict(attrs=['pid', 'name', 'status', 'cpu_times', 'memory_info']))
+    print(l_process)
 
 
 def controle_setas():
@@ -500,6 +511,10 @@ ip_net = ""
 def main():
     controle = 60
     pagina = 0
+
+    # Variável de controle de impressão no terminal.
+    printed = False
+
     while True:
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -512,14 +527,14 @@ def main():
                     if pagina > 0:
                         pagina -= 1
                 if colisao_setas(pos) == 2:
-                    if pagina < 7:
+                    if pagina < 8:
                         pagina += 1
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT:
                     if pagina > 0:
                         pagina -= 1
                 if event.key == pygame.K_RIGHT:
-                    if pagina < 7:
+                    if pagina < 8:
                         pagina += 1
                 if event.key == pygame.K_SPACE:
                     pagina = 4
@@ -537,9 +552,19 @@ def main():
             if pagina == 4:
                 resumo()
             if pagina == 5:
-                arquivos()
+                lista = listagem_diretorio(os.environ['HOMEPATH'])[0]
+                if not printed:
+                    print_arquivos(lista)
+                    printed = True
+                arquivos('surface_06', "Arquivos", lista)
             if pagina == 6:
-                resumo()
+                lista = listagem_diretorio(os.environ['HOMEPATH'])[1]
+                if printed:
+                    print_arquivos(lista)
+                    printed = False
+                arquivos('surface_07', "Pastas", lista)
+            if pagina == 7:
+                processos()
             controle = 0
         pygame.display.update()
         controle += 1
