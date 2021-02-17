@@ -581,6 +581,7 @@ def main():
                 resumo()
             if pagina == 5:
                 print('\nInício em:		', time.ctime(), '    ', time.process_time())
+                time.sleep(2)
                 lista = listagem_diretorio(os.environ['HOMEPATH'])[0]
                 scheduler.enter(0, 5, arquivos, ("Arquivos", lista))
                 if not printed:
