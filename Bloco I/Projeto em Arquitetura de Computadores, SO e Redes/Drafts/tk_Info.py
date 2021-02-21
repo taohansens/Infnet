@@ -8,6 +8,7 @@ def cpu_info():
     threads = int(psutil.cpu_count())
     return {'cores': cores, 'threads': threads}
 
+
 class PySysInfo:
 
     def __init__(self, master=None):
