@@ -1,13 +1,14 @@
 import tkinter as tk
 import tkinter.ttk as ttk
-
 import psutil
+import cpuinfo
 
 
 def cpu_info():
     cores = psutil.cpu_count(logical=False)
     threads = int(psutil.cpu_count())
-    return {'cores': cores, 'threads': threads}
+    cpu_name = cpuinfo.get_cpu_info()['brand_raw']
+    return {'cores': cores, 'threads': threads, 'name_processor': cpu_name}
 
 
 class PysysinfoguiApp:
@@ -16,8 +17,18 @@ class PysysinfoguiApp:
         self.notebook_pysysgameinfo = ttk.Notebook(master)
         self.cpu_detailed_info = ttk.Frame(self.notebook_pysysgameinfo)
         self.cpu_processor_info = ttk.Labelframe(self.cpu_detailed_info)
+        self.processor_info_name = tk.Label(self.cpu_processor_info)
+        self.processor_info_name.configure(justify='left', text='Name')
+        self.processor_info_name.grid(sticky='e')
+        self.processor_info_name.grid_propagate(0)
+        self.processor_info_name_4 = tk.Label(self.cpu_processor_info)
+        ProcessorName = tk.StringVar('')
+        ProcessorName.set(cpu_info()['name_processor'])
+        self.processor_info_name_4.configure(foreground='#000080', relief='groove', text='ProcessorName', textvariable=ProcessorName)
+        self.processor_info_name_4.grid(column='1', padx='20', row='0', sticky='e')
         self.cpu_processor_info.configure(height='200', text='Processador', width='399')
         self.cpu_processor_info.grid()
+        self.cpu_processor_info.grid_propagate(0)
         self.cpu_processor_info.columnconfigure('0', minsize='0', pad='0')
         self.cpu_clocks = ttk.Labelframe(self.cpu_detailed_info)
         self.cpu_clocks.configure(height='150', text='Clocks (Core 0)', width='197')
@@ -46,7 +57,7 @@ class PysysinfoguiApp:
         self.cpu_count_cores = tk.Label(self.cpu_count)
         qtdRealCores = tk.IntVar()
         qtdRealCores.set(cpu_info()['cores'])
-        self.cpu_count_cores.configure(relief='groove', foreground='#000080', textvariable=qtdRealCores, width='3')
+        self.cpu_count_cores.configure(foreground='#000080', relief='groove', textvariable=qtdRealCores, width='3')
         self.cpu_count_cores.grid(column='1', row='0')
         self.cpu_count_threads = tk.Label(self.cpu_count)
         qtdThreadCores = tk.IntVar()
@@ -92,7 +103,7 @@ class PysysinfoguiApp:
 
 if __name__ == '__main__':
     import tkinter as tk
-
     root = tk.Tk()
     app = PysysinfoguiApp(root)
     app.run()
+
