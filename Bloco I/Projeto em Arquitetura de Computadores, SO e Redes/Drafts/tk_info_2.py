@@ -1,6 +1,14 @@
 import tkinter as tk
 import tkinter.ttk as ttk
 
+import psutil
+
+
+def cpu_info():
+    cores = psutil.cpu_count(logical=False)
+    threads = int(psutil.cpu_count())
+    return {'cores': cores, 'threads': threads}
+
 
 class PysysinfoguiApp:
     def __init__(self, master=None):
@@ -35,6 +43,18 @@ class PysysinfoguiApp:
         self.cpu_count_thread.grid(column='3', padx='5', row='0', sticky='e')
         self.cpu_count_thread.grid_propagate(0)
         self.cpu_count_thread.rowconfigure('0', pad='0', weight='0')
+        self.cpu_count_cores = tk.Label(self.cpu_count)
+        qtdRealCores = tk.IntVar()
+        qtdRealCores.set(cpu_info()['cores'])
+        self.cpu_count_cores.configure(relief='groove', foreground='#000080', textvariable=qtdRealCores, width='3')
+        self.cpu_count_cores.grid(column='1', row='0')
+        self.cpu_count_threads = tk.Label(self.cpu_count)
+        qtdThreadCores = tk.IntVar()
+        qtdThreadCores.set(cpu_info()['threads'])
+        self.cpu_count_threads.configure(font='TkDefaultFont', foreground='#000080', relief='groove',
+                                         textvariable=qtdThreadCores)
+        self.cpu_count_threads.configure(width='3')
+        self.cpu_count_threads.grid(column='4', row='0')
         self.cpu_count.configure(height='35', relief='flat', width='190')
         self.cpu_count.grid(column='0', pady='5', row='2')
         self.cpu_count.grid_propagate(0)
@@ -66,13 +86,13 @@ class PysysinfoguiApp:
         # Main widget
         self.mainwindow = self.notebook_pysysgameinfo
 
-
     def run(self):
         self.mainwindow.mainloop()
 
+
 if __name__ == '__main__':
     import tkinter as tk
+
     root = tk.Tk()
     app = PysysinfoguiApp(root)
     app.run()
-
