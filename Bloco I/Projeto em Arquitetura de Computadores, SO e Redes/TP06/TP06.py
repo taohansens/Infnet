@@ -1,12 +1,14 @@
 # Importação de bibliotecas
 import platform
 import re
+import socket
 import sys
 from datetime import datetime
 
 import cpuinfo
 from urllib.request import urlopen
 
+import nmap
 import psutil
 import pygame
 from dateutil.tz import tz
@@ -339,7 +341,7 @@ def resumo():
         INTERFACE_REDE = "Ethernet"
     else:
         INTERFACE_REDE = "Wi-Fi"
-    ip_rede = dic_interfaces[INTERFACE_REDE][1].address
+    ip_rede = obter_ip_local()
     net_mask = dic_interfaces[INTERFACE_REDE][1].netmask
     ip_local = "IPv4 Local: {}".format(ip_rede)
     ip_public = "IP Público: {}".format(ip_publico())
@@ -505,6 +507,76 @@ def processos():
     return l_process
 
 
+def print_network_nmap(network):
+    surface = pygame.Surface(TAM_TELA)
+    surface.fill(CINZA)
+    titulo = FONTE_TITLE.render(f"Nmap Scanner", True, ESCURO)
+    surface.blit(titulo, (40, 20))
+    qtd_ips = len(network[0])
+    info = FONTE_INFO_BOLD.render(f"{qtd_ips} IP(s) localizado(s) na busca.", True, ESCURO)
+    info2 = FONTE_INFO_BOLD.render(f"<<< Outros hosts e portas exibidos no console >>>", True, ESCURO)
+    surface.blit(info, (40, 80))
+    surface.blit(info2, (40, 100))
+
+    y = 180
+    x = 200
+    title_ip = FONTE_SUBINFO_BOLD.render(f"IP UTILIZADO NA BUSCA", True, ESCURO)
+    surface.blit(title_ip, (x, y - 20))
+
+    if network[1] in network[0]:
+        ip_localizado = FONTE_TITLE.render(f"{network[1]}", True, AZUL)
+        surface.blit(ip_localizado, (x, y))
+        y += 80
+        title_ports = FONTE_SUBINFO_BOLD.render(f"PORTA | STATUS | NOME", True, VERMELHO)
+        surface.blit(title_ports, (x, y - 20))
+        for port in network[0][network[1]]:
+            info_ip = FONTE_INFO_BOLD.render(
+                f"{port} - {network[0][network[1]][port]['state']} - {network[0][network[1]][port]['name']}", True, ESCURO)
+            surface.blit(info_ip, (x, y))
+            y += 20
+    TELA.blit(surface, (0, 0))
+
+
+def ips_nmap():
+    print("Scanner de Rede")
+    print("Escolha o IP:")
+    print("1. Meu IP\n2. Desejo digitar outro ip.")
+    try:
+        escolha = int(input("Digite o que você deseja: "))
+    except:
+        print("Tente novamente.")
+        escolha = int(input("Digite o que você deseja: "))
+
+    ip = obter_ip_local()
+    if escolha == 1:
+        print("IP:", ip)
+    if escolha == 2:
+        ip_digitado = input("Digite o endereço ip desejado: ")
+        ip = ip_digitado
+
+    subnet = input('Digite a máscara de sub-rede CIDR (padrão=25): ')
+
+    nm = nmap.PortScanner()
+    nm.scan(hosts=ip + "/" + subnet, arguments="-F -n")
+
+    ips_up = {}
+    if nm.all_hosts():
+        for host in nm.all_hosts():
+            if nm[host].state() == 'up':
+                try:
+                    ips_up[host] = nm[host]['tcp']
+                except:
+                    ValueError()
+    else:
+        print("não encontrado")
+    for host in ips_up:
+        print("IP: ", host)
+        for port in ips_up[host]:
+            print(f"{port} - {ips_up[host][port]['state']} - {ips_up[host][port]['name']}")
+        print("=========")
+    return ips_up, ip
+
+
 def controle_setas():
     surface_seta = pygame.Surface(TAM_TELA)
     surface_seta.fill(CINZA)
@@ -531,6 +603,19 @@ def ip_publico():
     return re.compile(r'Address: (\d+\.\d+\.\d+\.\d+)').search(data).group(1)
 
 
+# Verifica IP Local
+def obter_ip_local():
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        s.connect(('10.255.255.255', 1))
+        IP = s.getsockname()[0]
+    except Exception:
+        IP = '127.0.0.1'
+    finally:
+        s.close()
+    return IP
+
+
 # Variável inicializada vazia (IP_Externo)
 ip_net = ""
 scheduler = sched.scheduler(time.time, time.sleep)
@@ -555,17 +640,18 @@ def main():
                     if pagina > 0:
                         pagina -= 1
                 if colisao_setas(pos) == 2:
-                    if pagina < 8:
+                    if pagina < 9:
                         pagina += 1
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT:
                     if pagina > 0:
                         pagina -= 1
                 if event.key == pygame.K_RIGHT:
-                    if pagina < 8:
+                    if pagina < 9:
                         pagina += 1
+                # dev = Original = 4
                 if event.key == pygame.K_SPACE:
-                    pagina = 4
+                    pagina = 8
 
         if controle == 60:
             controle_setas()
@@ -579,6 +665,7 @@ def main():
                 rede(ip_publico())
             if pagina == 4:
                 resumo()
+                printed = False
             if pagina == 5:
                 print('\nInício em:		', time.ctime(), '    ', time.process_time())
                 time.sleep(2)
@@ -597,6 +684,10 @@ def main():
             if pagina == 7:
                 if not printed:
                     scheduler.enter(0, 5, print_processos_terminal, kwargs={'l_process': processos()})
+                    printed = True
+            if pagina == 8:
+                if not printed:
+                    scheduler.enter(0, 5, print_network_nmap, kwargs={'network': ips_nmap()})
                     printed = True
             controle = 0
             scheduler.run()
