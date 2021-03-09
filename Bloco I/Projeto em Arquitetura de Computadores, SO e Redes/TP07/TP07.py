@@ -795,7 +795,7 @@ def main():
                     if pagina < 11:
                         pagina += 1
                 if event.key == pygame.K_SPACE:
-                    pagina = 10
+                    pagina = 4
 
         if controle == 60:
             controle_setas()
