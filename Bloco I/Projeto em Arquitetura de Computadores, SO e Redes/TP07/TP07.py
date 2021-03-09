@@ -609,6 +609,7 @@ def infor_adapters():
              list_of_adapters[escolha - 1]}
     return dados
 
+
 def informacoes_rede(rede):
     surface = pygame.Surface(TAM_TELA)
     surface.fill(CINZA)
@@ -627,6 +628,98 @@ def informacoes_rede(rede):
     surface.blit(netmask, (200, 180))
     surface.blit(gateway, (200, 200))
     TELA.blit(surface, (0, 0))
+    estatisticas_rede()
+
+
+def estatisticas_rede():
+    total_adapter_antes = psutil.net_io_counters(pernic=True)
+    time.sleep(1)
+    total_adapter_depois = psutil.net_io_counters(pernic=True)
+
+    adapters = list(total_adapter_depois.keys())
+    for adapter in adapters:
+        status_antes = total_adapter_antes[adapter]
+        status_depois = total_adapter_depois[adapter]
+        templ = "%-15s %15s %15s"
+        print("======== Status do Adaptador ========")
+        print(templ % (adapter, "TOTAL", "POR-SEG"))
+        print(templ % (
+            "Enviados (KB)",
+            round(status_depois.bytes_sent / 1024, 2),
+            round((status_depois.bytes_sent - status_antes.bytes_sent) / 1024, 2),
+        ))
+        print(templ % (
+            "Recebidos (KB)",
+            round(status_depois.bytes_recv / 1024, 2),
+            round((status_depois.bytes_recv - status_antes.bytes_recv) / 1024, 2),
+        ))
+        print(templ % (
+            "Pacotes Env.",
+            status_depois.packets_sent,
+            status_depois.packets_sent - status_antes.packets_sent,
+        ))
+        print(templ % (
+            "Pacotes Rec.",
+            status_depois.packets_recv,
+            status_depois.packets_recv - status_antes.packets_recv,
+        ))
+        print("\n")
+
+
+def uso_redes_processos():
+    surface = pygame.Surface(TAM_TELA)
+    surface.fill(CINZA)
+    titulo = FONTE_TITLE.render("Uso de rede por processo", True, ESCURO)
+    surface.blit(titulo, (30, 20))
+    info = FONTE_INFO_BOLD.render(f"Processos listados no terminal. Em ordem (PID)", True, ESCURO)
+    surface.blit(info, (40, 120))
+    TELA.blit(surface, (0, 0))
+    print_processos_rede()
+
+
+def family_type(family):
+    if family == socket.AF_INET:
+        return "IPv4"
+    elif family == socket.AF_INET6:
+        return "IPv6"
+    elif family == socket.AF_UNIX:
+        return "Unix"
+    else:
+        return '-'
+
+
+def get_socket_type(sock):
+    if sock == socket.SOCK_STREAM:
+        return "TCP"
+    elif sock == socket.SOCK_DGRAM:
+        return "UDP"
+    elif sock == socket.SOCK_RAW:
+        return "IP"
+    else:
+        return "-"
+
+
+def print_processos_rede():
+    for i in psutil.pids():
+        p = psutil.Process(i)
+        conn = p.connections()
+        if len(conn) > 0:
+            if conn[0].status.ljust(13) != "ESTABLISHED":
+                endl = conn[0].laddr.ip.ljust(11)
+                portl = str(conn[0].laddr.port).ljust(5)
+                try:
+                    endr = conn[0].raddr.ip.ljust(13)
+                except:
+                    endr = "-"
+                try:
+                    portr = str(conn[0].raddr.port).ljust(5)
+                except:
+                    portr = "-"
+                print(str(i).ljust(5), "End.  Tipo   Status        Endereço L.   Porta L.     Endereço R.     "
+                                       "Porta R.")
+                print("     ", family_type(conn[0].family), " " + get_socket_type(conn[0].type),
+                      "   " + conn[0].status.ljust(13),
+                      endl, "  " + portl, "       " + endr, "  " + portr)
 
 
 def controle_setas():
@@ -692,17 +785,17 @@ def main():
                     if pagina > 0:
                         pagina -= 1
                 if colisao_setas(pos) == 2:
-                    if pagina < 10:
+                    if pagina < 11:
                         pagina += 1
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT:
                     if pagina > 0:
                         pagina -= 1
                 if event.key == pygame.K_RIGHT:
-                    if pagina < 10:
+                    if pagina < 11:
                         pagina += 1
                 if event.key == pygame.K_SPACE:
-                    pagina = 9
+                    pagina = 10
 
         if controle == 60:
             controle_setas()
@@ -744,6 +837,10 @@ def main():
                 if not printed:
                     scheduler.enter(0, 5, informacoes_rede, kwargs={'rede': infor_adapters()})
                     printed = True
+            if pagina == 10:
+                if printed:
+                    scheduler.enter(0, 5, uso_redes_processos)
+                    printed = False
             controle = 0
             scheduler.run()
         pygame.display.update()
