@@ -8,6 +8,7 @@ from datetime import datetime
 import cpuinfo
 from urllib.request import urlopen
 
+import netifaces
 import nmap
 import psutil
 import pygame
@@ -575,6 +576,59 @@ def ips_nmap():
     return ips_up, ip
 
 
+def infor_adapters():
+    cont = 1
+    list_of_adapters = []
+    for rede in psutil.net_if_addrs():
+        list_of_adapters.append(rede)
+        print(f"{cont}... {rede}")
+        cont += 1
+    escolha = int(input("Digite qual interface de rede você deseja visualizar: "))
+    adapter = psutil.net_if_addrs().get(list_of_adapters[escolha - 1])
+
+    for snicaddr in adapter:
+        if snicaddr.family == socket.AF_INET:
+            ipv4 = snicaddr.address
+            netmask = snicaddr.netmask
+        elif snicaddr.family == socket.AF_INET6:
+            ipv6 = snicaddr.address
+            if snicaddr.address is None:
+                ipv6 = "-"
+            if snicaddr.netmask is not None:
+                netmask = snicaddr.netmask
+        else:
+            ipv4 = None
+            ipv6 = None
+
+    try:
+        gateway = netifaces.gateways()['default'][2][0]
+    except:
+        gateway = None
+
+    dados = {'ip': ipv4, 'ip6': ipv6, 'netmask': netmask, 'gateway': gateway, 'name':
+             list_of_adapters[escolha - 1]}
+    return dados
+
+def informacoes_rede(rede):
+    surface = pygame.Surface(TAM_TELA)
+    surface.fill(CINZA)
+    titulo = FONTE_TITLE.render(f"Informações de Rede", True, ESCURO)
+    surface.blit(titulo, (40, 20))
+    title_info = FONTE_SUBINFO_BOLD.render(f"ADAPTADOR ESCOLHIDO", True, ESCURO)
+    info = FONTE_TITLE.render(f"{rede['name']}", True, AZUL)
+    ip4 = FONTE_INFO_BOLD.render(f"IPv4 {rede['ip']}", True, ESCURO)
+    ip6 = FONTE_INFO_BOLD.render(f"IPv6 {rede['ip6']}", True, ESCURO)
+    netmask = FONTE_INFO_BOLD.render(f"Netmask {rede['netmask']}", True, ESCURO)
+    gateway = FONTE_INFO_BOLD.render(f"Gateway {rede['gateway']}", True, ESCURO)
+    surface.blit(title_info, (200, 80))
+    surface.blit(info, (200, 100))
+    surface.blit(ip4, (200, 140))
+    surface.blit(ip6, (200, 160))
+    surface.blit(netmask, (200, 180))
+    surface.blit(gateway, (200, 200))
+    TELA.blit(surface, (0, 0))
+
+
 def controle_setas():
     surface_seta = pygame.Surface(TAM_TELA)
     surface_seta.fill(CINZA)
@@ -638,17 +692,17 @@ def main():
                     if pagina > 0:
                         pagina -= 1
                 if colisao_setas(pos) == 2:
-                    if pagina < 9:
+                    if pagina < 10:
                         pagina += 1
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT:
                     if pagina > 0:
                         pagina -= 1
                 if event.key == pygame.K_RIGHT:
-                    if pagina < 9:
+                    if pagina < 10:
                         pagina += 1
                 if event.key == pygame.K_SPACE:
-                    pagina = 4
+                    pagina = 9
 
         if controle == 60:
             controle_setas()
@@ -683,12 +737,12 @@ def main():
                     scheduler.enter(0, 5, print_processos_terminal, kwargs={'l_process': processos()})
                     printed = True
             if pagina == 8:
-                if not printed:
+                if printed:
                     scheduler.enter(0, 5, print_network_nmap, kwargs={'network': ips_nmap()})
                     printed = False
             if pagina == 9:
                 if not printed:
-                    scheduler.enter(0, 5, "#")
+                    scheduler.enter(0, 5, informacoes_rede, kwargs={'rede': infor_adapters()})
                     printed = True
             controle = 0
             scheduler.run()
