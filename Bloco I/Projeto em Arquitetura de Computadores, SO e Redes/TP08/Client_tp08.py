@@ -6,7 +6,7 @@ s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 try:
     # Server iniciado na AWS
-    s.connect((host, 5001))
+    s.connect(('52.67.6.168', 5001))
 except ConnectionRefusedError as error:
     print(error)
 
