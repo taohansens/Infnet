@@ -24,11 +24,22 @@ def processador():
         'arc': info_cpu['arch'],
         'word': f"{info_cpu['bits']}",
         'threads': psutil.cpu_count(),
-        'cores': psutil.cpu_count(logical=False)
+        'cores': psutil.cpu_count(logical=False),
+        'uso_cpu': psutil.cpu_percent(percpu=True)
     }
-    print(psutil.cpu_count())
     return dict_cpu
 
+
+def memoria_ram():
+    memoria = psutil.virtual_memory()
+    dict_memory = {
+        'conexao': "OK",
+        'percent': memoria.percent,
+        'total': memoria.total,
+        'used': memoria.used,
+        'free': memoria.free
+    }
+    return dict_memory
 
 executar = True
 while executar:
@@ -37,6 +48,9 @@ while executar:
     mensagem = socket_cliente.recv(2048).decode('ascii')
     if mensagem == "CPU":
         dados = pickle.dumps(processador())
+        socket_cliente.send(dados)
+    if mensagem == "MEMORY":
+        dados = pickle.dumps(memoria_ram())
         socket_cliente.send(dados)
     else:
         dados = {'conexao': 'ERROR'}

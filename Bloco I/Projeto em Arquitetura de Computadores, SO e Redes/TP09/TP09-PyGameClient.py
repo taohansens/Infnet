@@ -5,6 +5,8 @@ import pygame
 from pygame.locals import *
 import sys
 
+from psutil._common import bytes2human
+
 # INICIA PYGAME
 pygame.init()
 CLOCK = pygame.time.Clock()
@@ -121,7 +123,58 @@ def processador():
     t_info6 = FONTE_SUBINFO_BOLD.render(f"{request[0]['threads']} threads | {request[0]['cores']} núcleos", True, ESCURO)
     surface.blit(t_info6, (ALINHAMENTO + 80, 180))
 
+    # Exibição da barra CPU
+    var_barra = 0
+    pos_final_barra = int(LARGURA_TELA - LARGURA_TELA * 0.15)
+
+    for i in request[0]['uso_cpu']:
+        percentagem_uso = FONTE_PERCENT_PROC.render(f"{i}%", True, ESCURO)
+        surface.blit(percentagem_uso, (15, 200 + var_barra))
+        pygame.draw.rect(surface, AZUL, (60, 200 + var_barra, pos_final_barra, 15))
+        pos_final_barra_uso = pos_final_barra * (i / 100)
+        pygame.draw.rect(surface, VERMELHO, (60, 200 + var_barra, pos_final_barra_uso, 15))
+        var_barra += 25
+
     TELA.blit(surface, (0, 0))
+
+
+def memoria_ram():
+    request = get_server("MEMORY")
+    surface = pygame.Surface(TAM_TELA)
+    surface.fill(CINZA)
+    ALINHAMENTO = 120
+    # Posições em pixels
+    pos_altura_barra = 110
+    pos_final_barra = int(LARGURA_TELA - LARGURA_TELA * 0.15)
+    # Desenha barra total (em azul)
+    pygame.draw.rect(surface, AZUL, (70, pos_altura_barra, pos_final_barra, 45))
+    # Barra de uso (em vermelho)
+    pos_final_barra_uso = pos_final_barra * (request[0]['percent'] / 100)
+    pygame.draw.rect(surface, VERMELHO, (70, pos_altura_barra, pos_final_barra_uso, 45))
+
+    title = FONTE_TITLE.render("INFORMAÇÕES MEMÓRIA", True, ESCURO)
+    surface.blit(title, (150, 40))
+
+    t_info1 = FONTE_PERCENT.render(f"{request[0]['percent']}%", True, ESCURO)
+    surface.blit(t_info1, (20, 125))
+
+    t_info2 = FONTE_SUBINFO_BOLD.render(f"Memória Em Uso", True, ESCURO)
+    info2 = FONTE_INFO_BOLD.render(f"{bytes2human(request[0]['used'])}", True, ESCURO)
+    surface.blit(t_info2, (ALINHAMENTO, 170))
+    surface.blit(info2, (ALINHAMENTO, 185))
+
+    t_info3 = FONTE_SUBINFO_BOLD.render(f"Memória Física Total", True, ESCURO)
+    info3 = FONTE_INFO_BOLD.render(f"{bytes2human(request[0]['total'])}", True, ESCURO)
+    surface.blit(t_info3, (ALINHAMENTO + 300, 170))
+    surface.blit(info3, (ALINHAMENTO + 300, 185))
+
+    t_info4 = FONTE_SUBINFO_BOLD.render(f"Memória Livre", True, ESCURO)
+    info4 = FONTE_INFO_BOLD.render(f"{bytes2human(request[0]['free'])}", True, ESCURO)
+    surface.blit(t_info4, (ALINHAMENTO + 160, 170))
+    surface.blit(info4, (ALINHAMENTO + 160, 185))
+    TELA.blit(surface, (0, 0))
+
+
 # FIM PÁGINAS ##################
 
 
@@ -157,6 +210,9 @@ def main():
             if pagina == 0 and not printed:
                 processador()
                 printed = True
+            if pagina == 1 and printed:
+                memoria_ram()
+                printed = False
             controle = 0
         pygame.display.update()
         controle += 1
