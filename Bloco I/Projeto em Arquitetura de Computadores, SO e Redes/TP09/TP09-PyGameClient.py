@@ -106,10 +106,10 @@ def processador():
     surface.blit(t_info2, (ALINHAMENTO, 100))
     surface.blit(info2, (ALINHAMENTO, 110))
 
-    t_info3 = FONTE_SUBINFO_BOLD.render(f"Frequência", True, ESCURO)
-    info3 = FONTE_INFO.render(f"{request[0]['freq']} MHz", True, ESCURO)
-    surface.blit(t_info3, (ALINHAMENTO, 140))
-    surface.blit(info3, (ALINHAMENTO, 150))
+    t_info3 = FONTE_SUBINFO_BOLD.render(f"Frequência Atual/Total", True, ESCURO)
+    info3 = FONTE_INFO.render(f"{request[0]['freq_atual']} MHz / {request[0]['freq']}MHz", True, ESCURO)
+    surface.blit(t_info3, (ALINHAMENTO-80, 140))
+    surface.blit(info3, (ALINHAMENTO-95, 150))
 
     t_info4 = FONTE_SUBINFO_BOLD.render(f"Arquitetura", True, ESCURO)
     info4 = FONTE_INFO.render(request[0]['arc'], True, ESCURO)
@@ -152,7 +152,7 @@ def processador():
     TELA.blit(surface, (0, 0))
 
 
-def memoria_ram():
+def memoria_ram_rede():
     request = get_server("MEMORY")
     surface = pygame.Surface(TAM_TELA)
     surface.fill(CINZA)
@@ -186,8 +186,34 @@ def memoria_ram():
     info4 = FONTE_INFO_BOLD.render(f"{bytes2human(request[0]['free'])}", True, ESCURO)
     surface.blit(t_info4, (ALINHAMENTO + 160, 170))
     surface.blit(info4, (ALINHAMENTO + 160, 185))
-    TELA.blit(surface, (0, 0))
 
+    request_rede = get_server("REDE")
+    title2 = FONTE_TITLE.render("INFORMAÇÕES REDE", True, ESCURO)
+    surface.blit(title2, (150, 300))
+
+    info5 = FONTE_INFO_BOLD.render(f"IPv4", True, ESCURO)
+    info5_1 = FONTE_TITLE.render(f"{request_rede[0]['ipv4']}", True, AZUL)
+    surface.blit(info5, (150, 340))
+    surface.blit(info5_1, (150, 360))
+
+    info6 = FONTE_INFO_BOLD.render(f"Máscara de Rede", True, ESCURO)
+    info6_1 = FONTE_TITLE.render(f"{request_rede[0]['net_mask']}", True, AZUL)
+    surface.blit(info6, (150, 390))
+    surface.blit(info6_1, (150, 410))
+
+    info7 = FONTE_INFO_BOLD.render(f"Gateway", True, ESCURO)
+    info7_1 = FONTE_TITLE.render(f"{request_rede[0]['gateway']}", True, AZUL)
+    surface.blit(info7, (150, 440))
+    surface.blit(info7_1, (150, 460))
+
+    info8 = FONTE_INFO_BOLD.render(f"IP público", True, ESCURO)
+    info8_1 = FONTE_TITLE.render(f"{request_rede[0]['public_ip']}", True, AZUL)
+    surface.blit(info8, (300, 340))
+    surface.blit(info8_1, (300, 360))
+
+
+
+    TELA.blit(surface, (0, 0))
 
 def discos():
     request = get_server("DISKS")
@@ -277,7 +303,7 @@ def main():
                 processador()
                 printed = True
             if pagina == 1 and printed:
-                memoria_ram()
+                memoria_ram_rede()
                 printed = False
             if pagina == 2 and not printed:
                 discos()

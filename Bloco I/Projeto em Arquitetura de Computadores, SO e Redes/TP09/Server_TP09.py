@@ -1,6 +1,10 @@
 import pickle
 import platform
+import re
 import socket
+from urllib.request import urlopen
+
+import netifaces
 import psutil
 from cpuinfo import cpuinfo
 
@@ -21,6 +25,7 @@ def processador():
         'name': info_cpu['brand_raw'],
         'system': f"{platform.system()} ({platform.platform()})",
         'freq': f"{psutil.cpu_freq().max}",
+        'freq_atual': f"{psutil.cpu_freq().current}",
         'arc': info_cpu['arch'],
         'word': f"{info_cpu['bits']}",
         'threads': psutil.cpu_count(),
@@ -41,6 +46,49 @@ def memoria_ram():
         'free': memoria.free
     }
     return dict_memory
+
+
+def info_redes():
+    dic_interfaces = psutil.net_if_addrs()
+    if "Wi-Fi 6" in dic_interfaces:
+        INTERFACE_REDE = "Wi-Fi 6"
+    elif "Ethernet" in dic_interfaces:
+        INTERFACE_REDE = "Ethernet"
+    else:
+        INTERFACE_REDE = "Wi-Fi"
+
+    try:
+        gateway = netifaces.gateways()['default'][2][0]
+    except:
+        gateway = None
+
+    dict_network = {
+        'ipv4': obter_ip_local(),
+        'public_ip': ip_publico(),
+        'net_mask': dic_interfaces[INTERFACE_REDE][1].netmask,
+        'gateway': gateway
+    }
+    return dict_network
+
+
+def obter_ip_local():
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        s.connect(('10.255.255.255', 1))
+        ip = s.getsockname()[0]
+    except Exception:
+        ip = '127.0.0.1'
+    finally:
+        s.close()
+    return ip
+
+
+def ip_publico():
+    try:
+        data = str(urlopen('http://checkip.dyndns.com/').read())
+        return re.compile(r'Address: (\d+\.\d+\.\d+\.\d+)').search(data).group(1)
+    except Exception:
+        return "Error."
 
 
 def verifica_discos():
@@ -67,8 +115,6 @@ def verifica_discos():
     return qtd_discos, string_discos, espaco_total, espaco_usado, espaco_livre, percent_usado
 
 
-
-
 executar = True
 while executar:
     (socket_cliente, addr) = socket_servidor.accept()
@@ -77,11 +123,14 @@ while executar:
     if mensagem == "CPU":
         dados = pickle.dumps(processador())
         socket_cliente.send(dados)
-    if mensagem == "MEMORY":
+    elif mensagem == "MEMORY":
         dados = pickle.dumps(memoria_ram())
         socket_cliente.send(dados)
-    if mensagem == "DISKS":
+    elif mensagem == "DISKS":
         dados = pickle.dumps(verifica_discos())
+        socket_cliente.send(dados)
+    elif mensagem == "REDE":
+        dados = pickle.dumps(info_redes())
         socket_cliente.send(dados)
     else:
         dados = {'conexao': 'ERROR'}
