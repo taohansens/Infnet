@@ -234,8 +234,8 @@ def discos():
     surface.blit(info5_1, (ALINHAMENTO + 130, 375))
 
     t_info6 = FONTE_SUBINFO_BOLD_X.render(f"ESPAÇO TOTAL LIVRE", True, ESCURO)
-    info6 = FONTE_TITLE.render(f"{bytes2human(request[0][2])}", True, AZUL)
-    info6_1 = FONTE_PERCENT_PROC.render(f"({request[0][2]}) BYTES", True, AZUL)
+    info6 = FONTE_TITLE.render(f"{bytes2human(request[0][4])}", True, AZUL)
+    info6_1 = FONTE_PERCENT_PROC.render(f"({request[0][4]}) BYTES", True, AZUL)
     surface.blit(t_info6, (ALINHAMENTO + 280, 240))
     surface.blit(info6, (ALINHAMENTO + 280, 265))
     surface.blit(info6_1, (ALINHAMENTO + 280, 290))
