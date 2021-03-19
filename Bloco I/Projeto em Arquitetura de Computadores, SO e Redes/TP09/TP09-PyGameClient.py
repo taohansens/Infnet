@@ -18,6 +18,7 @@ FONTE_TITLE = pygame.font.SysFont("segoe-ui-bold", 36)
 FONTE_INFO = pygame.font.SysFont("segoe-ui", 18)
 FONTE_INFO_BOLD = pygame.font.SysFont("segoe-ui-bold", 26)
 FONTE_SUBINFO_BOLD = pygame.font.SysFont("segoe-ui-bold", 20)
+FONTE_SUBINFO_BOLD_X = pygame.font.SysFont("segoe-ui-bold", 24)
 FONTE_PERCENT = pygame.font.SysFont("segoe", 26)
 FONTE_PERCENT_PROC = pygame.font.SysFont("segoe", 20)
 
@@ -121,9 +122,22 @@ def processador():
     surface.blit(info5, (ALINHAMENTO + 240, 150))
 
     t_info6 = FONTE_SUBINFO_BOLD.render(f"{request[0]['threads']} threads | {request[0]['cores']} núcleos", True, ESCURO)
-    surface.blit(t_info6, (ALINHAMENTO + 80, 180))
+    surface.blit(t_info6, (ALINHAMENTO + 100, 180))
 
-    # Exibição da barra CPU
+    t_info7 = FONTE_SUBINFO_BOLD.render(f"Uso por CPU", True, ESCURO)
+    surface.blit(t_info7, (20, 180))
+
+    convert_cpu = float(request[0]['uso_cpu_todos'])
+    t_info8 = FONTE_SUBINFO_BOLD.render("Uso Geral", True, ESCURO)
+    t_info9 = FONTE_SUBINFO_BOLD.render(f"{convert_cpu}%", True, ESCURO)
+    surface.blit(t_info8, (20, 80))
+    surface.blit(t_info9, (10, 105))
+
+    pygame.draw.rect(surface, AZUL, (50, 100, 50, 20))
+    pos_final_barra_uso = 50 * (convert_cpu / 100)
+    pygame.draw.rect(surface, VERMELHO, [50, 100, pos_final_barra_uso, 20])
+
+    # Exibição por cpu.
     var_barra = 0
     pos_final_barra = int(LARGURA_TELA - LARGURA_TELA * 0.15)
 
@@ -175,6 +189,58 @@ def memoria_ram():
     TELA.blit(surface, (0, 0))
 
 
+def discos():
+    request = get_server("DISKS")
+    surface = pygame.Surface(TAM_TELA)
+    surface.fill(CINZA)
+
+    ALINHAMENTO = 80
+    # Posições em pixels
+    pos_altura_barra = 110
+    pos_final_barra = int(LARGURA_TELA - LARGURA_TELA * 0.15)
+    # Desenha barra total (em azul)
+    pygame.draw.rect(surface, AZUL, (70, pos_altura_barra, pos_final_barra, 30))
+    # Barra de uso (em vermelho)
+    pos_final_barra_uso = pos_final_barra * (request[0][5] / 100)
+    pygame.draw.rect(surface, VERMELHO, (70, pos_altura_barra, pos_final_barra_uso, 30))
+
+    title = FONTE_TITLE.render("ARMAZENAMENTO TOTAL - DISCO(S)", True, ESCURO)
+    surface.blit(title, (80, 40))
+    info1 = FONTE_PERCENT.render(f"{request[0][5]}%", True, ESCURO)
+    surface.blit(info1, (15, pos_altura_barra + 5))
+
+    t_info2 = FONTE_SUBINFO_BOLD.render(f"QTD DE DISCOS ENCONTRADOS", True, ESCURO)
+    info2 = FONTE_INFO_BOLD.render(f"{round(request[0][0])}", True, ESCURO)
+    surface.blit(t_info2, (ALINHAMENTO, 185))
+    surface.blit(info2, (ALINHAMENTO, 200))
+
+    t_info3 = FONTE_SUBINFO_BOLD.render(f"PONTOS DE MONTAGEM", True, ESCURO)
+    info3 = FONTE_INFO_BOLD.render(f"{request[0][1]}", True, ESCURO)
+    surface.blit(t_info3, (ALINHAMENTO + 300, 185))
+    surface.blit(info3, (ALINHAMENTO + 300, 200))
+
+    t_info4 = FONTE_SUBINFO_BOLD_X.render(f"ESPAÇO TOTAL", True, ESCURO)
+    info4 = FONTE_TITLE.render(f"{bytes2human(request[0][2])}", True, ESCURO)
+    info4_1 = FONTE_PERCENT_PROC.render(f"({request[0][2]}) BYTES", True, ESCURO)
+    surface.blit(t_info4, (ALINHAMENTO, 240))
+    surface.blit(info4, (ALINHAMENTO, 265))
+    surface.blit(info4_1, (ALINHAMENTO, 290))
+
+    t_info5 = FONTE_SUBINFO_BOLD_X.render(f"ESPAÇO TOTAL UTILIZADO", True, ESCURO)
+    info5 = FONTE_TITLE.render(f"{bytes2human(request[0][3])}", True, VERMELHO)
+    info5_1 = FONTE_PERCENT_PROC.render(f"({request[0][3]}) BYTES", True, VERMELHO)
+    surface.blit(t_info5, (ALINHAMENTO + 130, 330))
+    surface.blit(info5, (ALINHAMENTO + 130, 350))
+    surface.blit(info5_1, (ALINHAMENTO + 130, 375))
+
+    t_info6 = FONTE_SUBINFO_BOLD_X.render(f"ESPAÇO TOTAL LIVRE", True, ESCURO)
+    info6 = FONTE_TITLE.render(f"{bytes2human(request[0][2])}", True, AZUL)
+    info6_1 = FONTE_PERCENT_PROC.render(f"({request[0][2]}) BYTES", True, AZUL)
+    surface.blit(t_info6, (ALINHAMENTO + 280, 240))
+    surface.blit(info6, (ALINHAMENTO + 280, 265))
+    surface.blit(info6_1, (ALINHAMENTO + 280, 290))
+
+    TELA.blit(surface, (0, 0))
 # FIM PÁGINAS ##################
 
 
@@ -213,6 +279,9 @@ def main():
             if pagina == 1 and printed:
                 memoria_ram()
                 printed = False
+            if pagina == 2 and not printed:
+                discos()
+                printed = True
             controle = 0
         pygame.display.update()
         controle += 1
