@@ -1,13 +1,16 @@
 import json
+import os
 import pickle
 import platform
 import re
 import socket
+from datetime import datetime
 from urllib.request import urlopen
 
 import netifaces
 import psutil
 from cpuinfo import cpuinfo
+from dateutil.tz import tz
 
 socket_servidor = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 host = socket.gethostname()
@@ -116,6 +119,45 @@ def verifica_discos():
     return qtd_discos, string_discos, espaco_total, espaco_usado, espaco_livre, percent_usado
 
 
+def timestamp_converter(st_time):
+    time = datetime.fromtimestamp(st_time, tz=tz.tzlocal()).strftime('%d/%m/%Y-%H:%M')
+    return time
+
+
+def obtem_arquivos(diretorio):
+    class InfoArquivos:
+        def __init__(self, nome, tamanho, atime, mtime, isfile):
+            self.nome = nome
+            self.tamanho = tamanho
+            self.atime = atime
+            self.mtime = mtime
+            self.isfile = isfile
+
+    lista_arquivos = []
+    if os.path.exists(diretorio):
+        l_arquivos = os.listdir(diretorio)
+        for arquivo in l_arquivos:
+            caminho_arquivo = os.path.join(diretorio, arquivo)
+            arquivo_stat = os.stat(caminho_arquivo)
+            tamanho = f"{arquivo_stat.st_size // 1024} KB"
+            instFile = InfoArquivos(arquivo,
+                                    tamanho,
+                                    timestamp_converter(os.stat(caminho_arquivo).st_atime),
+                                    timestamp_converter(os.stat(caminho_arquivo).st_mtime),
+                                    os.path.isfile(caminho_arquivo))
+            lista_arquivos.append(instFile)
+    dict_files = {}
+    for arquivo in lista_arquivos:
+        dict_files[arquivo.nome] = {
+            'arquivo': arquivo.nome,
+            'tamanho': arquivo.tamanho,
+            'atime': arquivo.atime,
+            'mtime': arquivo.mtime,
+            'isfile': arquivo.isfile
+        }
+    return dict_files
+
+
 executar = True
 while executar:
     (socket_cliente, addr) = socket_servidor.accept()
@@ -132,6 +174,10 @@ while executar:
         socket_cliente.send(str.encode(dados))
     elif mensagem == "REDE":
         dados = json.dumps(info_redes())
+        socket_cliente.send(str.encode(dados))
+    elif mensagem == "FILES":
+        xdict = obtem_arquivos("C:"+os.environ['HOMEPATH'])
+        dados = json.dumps(xdict)
         socket_cliente.send(str.encode(dados))
     else:
         dados = {'conexao': 'ERROR'}

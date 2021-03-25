@@ -18,8 +18,15 @@ def get_server(solicitacao):
     try:
         s.connect((host, porta))
         s.send(f"{solicitacao}".encode('ascii'))
-        dados = json.loads(s.recv(1024))
-        s.close()
+        request = b''
+        while True:
+            data = s.recv(1024)
+            request = request + data
+            try:
+                dados = json.loads(request)
+                break
+            except:
+                continue
         informacoes = [dados, (host, porta)]
     except ConnectionRefusedError as error:
         dados = {'conexao': 'ERROR'}
@@ -28,6 +35,4 @@ def get_server(solicitacao):
     return informacoes
 
 
-print(get_server("MEMORI"))
-
-# s.close()
+print(get_server("DISKS"))
