@@ -1,3 +1,4 @@
+import json
 import pickle
 import socket
 
@@ -17,7 +18,7 @@ def get_server(solicitacao):
     try:
         s.connect((host, porta))
         s.send(f"{solicitacao}".encode('ascii'))
-        dados = pickle.loads(s.recv(10000))
+        dados = json.loads(s.recv(1024))
         s.close()
         informacoes = [dados, (host, porta)]
     except ConnectionRefusedError as error:
@@ -27,6 +28,6 @@ def get_server(solicitacao):
     return informacoes
 
 
-print(get_server("REDE"))
+print(get_server("MEMORI"))
 
 # s.close()

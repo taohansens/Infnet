@@ -1,3 +1,4 @@
+import json
 import pickle
 import platform
 import re
@@ -121,19 +122,20 @@ while executar:
     print("Conexão estabelecida com: ", str(addr))
     mensagem = socket_cliente.recv(2048).decode('ascii')
     if mensagem == "CPU":
-        dados = pickle.dumps(processador())
-        socket_cliente.send(dados)
+        dados = json.dumps(processador())
+        socket_cliente.send(str.encode(dados))
     elif mensagem == "MEMORY":
-        dados = pickle.dumps(memoria_ram())
-        socket_cliente.send(dados)
+        dados = json.dumps(memoria_ram())
+        socket_cliente.send(str.encode(dados))
     elif mensagem == "DISKS":
-        dados = pickle.dumps(verifica_discos())
-        socket_cliente.send(dados)
+        dados = json.dumps(verifica_discos())
+        socket_cliente.send(str.encode(dados))
     elif mensagem == "REDE":
-        dados = pickle.dumps(info_redes())
-        socket_cliente.send(dados)
+        dados = json.dumps(info_redes())
+        socket_cliente.send(str.encode(dados))
     else:
         dados = {'conexao': 'ERROR'}
-        socket_cliente.send(pickle.dumps(dados))
+        dados = json.dumps(dados)
+        socket_cliente.send(str.encode(dados))
 
 # socket_servidor.close()
