@@ -53,37 +53,46 @@ def memoria_ram():
 
 def info_redes():
     dic_interfaces = psutil.net_if_addrs()
-    if "Wi-Fi 6" in dic_interfaces:
-        INTERFACE_REDE = "Wi-Fi 6"
+    names = list(dic_interfaces.keys())
+    if "Wi-Fi" in dic_interfaces:
+        INTERFACE_REDE = "Wi-Fi"
     elif "Ethernet" in dic_interfaces:
         INTERFACE_REDE = "Ethernet"
+    elif 'eth0' in dic_interfaces:
+        INTERFACE_REDE = "eth0"
+    elif 'enpsl0' in dic_interfaces:
+        INTERFACE_REDE = "enpsl0"
     else:
-        INTERFACE_REDE = "Wi-Fi"
+        INTERFACE_REDE = names[0]
 
+    # Gateway
     try:
         gateway = netifaces.gateways()['default'][2][0]
     except:
         gateway = None
 
+    # IPv4 e IPv6
+    ipv4 = None
+    net_ipv4 = None
+    ipv6 = None
+    net_ipv6 = None
+    for snicaddr in dic_interfaces[INTERFACE_REDE]:
+        if snicaddr.family == socket.AF_INET:
+            ipv4 = snicaddr.address
+            net_ipv4 = snicaddr.netmask
+        if snicaddr.family == socket.AF_INET6:
+            ipv6 = snicaddr.address
+            net_ipv6 = snicaddr.netmask
+
     dict_network = {
-        'ipv4': obter_ip_local(),
         'public_ip': ip_publico(),
-        'net_mask': dic_interfaces[INTERFACE_REDE][1].netmask,
+        'ipv4': ipv4,
+        'netmask_4': net_ipv4,
+        'ipv6': ipv6,
+        'netmask_6': net_ipv6,
         'gateway': gateway
     }
     return dict_network
-
-
-def obter_ip_local():
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    try:
-        s.connect(('10.255.255.255', 1))
-        ip = s.getsockname()[0]
-    except Exception:
-        ip = '127.0.0.1'
-    finally:
-        s.close()
-    return ip
 
 
 def ip_publico():
