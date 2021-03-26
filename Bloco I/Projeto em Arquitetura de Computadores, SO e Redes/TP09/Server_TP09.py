@@ -154,11 +154,19 @@ def obtem_arquivos(diretorio):
 def processos():
     dict_process = {}
     for item in psutil.process_iter():
-        dict_process[item.name()] = item.as_dict(attrs=['pid', 'status', 'cpu_times', 'memory_info'])
+        dict_process[item.name()] = item.as_dict(attrs=['pid', 'status', 'memory_info'])
+    for item in dict_process:
+        dict_process[item] = {
+            'memrss': dict_process[item]['memory_info'].rss,
+            'memvms': dict_process[item]['memory_info'].vms,
+            'pid': dict_process[item]['pid'],
+            'status': dict_process[item]['status']
+        }
     return dict_process
 
 
 executar = True
+total = 0
 while executar:
     (socket_cliente, addr) = socket_servidor.accept()
     mensagem = socket_cliente.recv(1024).decode('ascii')
@@ -174,17 +182,19 @@ while executar:
     elif mensagem == "FILES":
         if platform.system() == "Windows":
             xdict = obtem_arquivos("C:"+os.environ['HOMEPATH'])
-        if platform.system() == "Linux":
+        elif platform.system() == "Linux":
             xdict = obtem_arquivos('/')
         else:
             xdict = obtem_arquivos(os.environ['PATH'])
         dados = json.dumps(xdict)
-    elif mensagem == "PROCESS":
+    elif mensagem == "PROCESSOS":
         dados = json.dumps(processos())
     else:
+        print("MENSAGEM NÃO RECONHECIDA. ENVIANDO ERROR.")
         dados = {'conexao': 'ERROR'}
         dados = json.dumps(dados)
     socket_cliente.send(str.encode(dados))
     print(f"ENVIADOS {bytes2human(dados.__sizeof__())} para {str(addr[0])}:{str(addr[1])}")
-
+    total += dados.__sizeof__()
+    print(f"TOTAL DE DADOS ENVIADOS DA SESSAO: {bytes2human(total)}")
 # socket_servidor.close()

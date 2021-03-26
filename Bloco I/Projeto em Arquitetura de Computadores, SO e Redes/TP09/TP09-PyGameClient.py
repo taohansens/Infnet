@@ -33,6 +33,7 @@ CINZA = (236, 240, 241)
 ESCURO = (52, 73, 94)
 VERMELHO = (231, 76, 60)
 AZUL = (52, 152, 219)
+VERDE = (24, 169, 153)
 BRANCO = (255, 255, 255)
 
 # CONSTANTES COM O TAMANHO DA TELA
@@ -155,6 +156,7 @@ def processador():
         var_barra += 25
 
     TELA.blit(surface, (0, 0))
+    pygame.display.update()
 
 
 def memoria_ram_rede():
@@ -198,27 +200,36 @@ def memoria_ram_rede():
 
     info5 = FONTE_INFO_BOLD.render(f"IPv4", True, ESCURO)
     info5_1 = FONTE_TITLE.render(f"{request_rede[0]['ipv4']}", True, AZUL)
-    surface.blit(info5, (150, 340))
-    surface.blit(info5_1, (150, 360))
+    surface.blit(info5, (120, 340))
+    surface.blit(info5_1, (120, 360))
 
-    info6 = FONTE_INFO_BOLD.render(f"Máscara de Rede", True, ESCURO)
-    info6_1 = FONTE_TITLE.render(f"{request_rede[0]['net_mask']}", True, AZUL)
-    surface.blit(info6, (150, 390))
-    surface.blit(info6_1, (150, 410))
+    info6 = FONTE_INFO_BOLD.render(f"Máscara de Rede v4", True, ESCURO)
+    info6_1 = FONTE_TITLE.render(f"{request_rede[0]['netmask_4']}", True, AZUL)
+    surface.blit(info6, (120, 390))
+    surface.blit(info6_1, (120, 410))
 
     info7 = FONTE_INFO_BOLD.render(f"Gateway", True, ESCURO)
     info7_1 = FONTE_TITLE.render(f"{request_rede[0]['gateway']}", True, AZUL)
-    surface.blit(info7, (150, 440))
-    surface.blit(info7_1, (150, 460))
+    surface.blit(info7, (120, 440))
+    surface.blit(info7_1, (120, 460))
 
-    info8 = FONTE_INFO_BOLD.render(f"IP público", True, ESCURO)
-    info8_1 = FONTE_TITLE.render(f"{request_rede[0]['public_ip']}", True, AZUL)
-    surface.blit(info8, (300, 340))
-    surface.blit(info8_1, (300, 360))
+    info8 = FONTE_INFO_BOLD.render(f"IPv6", True, ESCURO)
+    info8_1 = FONTE_INFO_BOLD.render(f"{request_rede[0]['ipv6']}", True, AZUL)
+    surface.blit(info8, (320, 340))
+    surface.blit(info8_1, (320, 360))
 
+    info9 = FONTE_INFO_BOLD.render(f"Máscara de Rede v6", True, ESCURO)
+    info9_1 = FONTE_INFO_BOLD.render(f"{request_rede[0]['netmask_6']}", True, AZUL)
+    surface.blit(info9, (320, 390))
+    surface.blit(info9_1, (320, 410))
 
-
+    info11 = FONTE_INFO_BOLD.render(f"IP público", True, ESCURO)
+    info11_1 = FONTE_TITLE.render(f"{request_rede[0]['public_ip']}", True, VERDE)
+    surface.blit(info11, (320, 440))
+    surface.blit(info11_1, (320, 460))
     TELA.blit(surface, (0, 0))
+    pygame.display.update()
+
 
 def discos():
     request = get_server("DISKS")
@@ -272,11 +283,12 @@ def discos():
     surface.blit(info6_1, (ALINHAMENTO + 280, 290))
 
     TELA.blit(surface, (0, 0))
+    pygame.display.update()
 
 
 def arquivos():
     request = get_server("FILES")
-    # print_arquivos_terminal(request)
+    print_arquivos_terminal(request[0])
     surface = pygame.Surface(TAM_TELA)
     surface.fill(CINZA)
 
@@ -309,21 +321,54 @@ def arquivos():
         surface.blit(ls_arquivo, (40, 90 + distancia_px))
 
     TELA.blit(surface, (0, 0))
+    pygame.display.update()
 
 
 def print_arquivos_terminal(lista):
     print("####### LISTAGEM DE ARQUIVOS | SERVER #######")
     templ = "%3s %0s %22s %10s %20s"
     print(templ % ("TIPO", "NOME", "TAMANHO", "DATA MOD", "DATA CRI"))
-    for d in lista[0]:
+    for d in lista:
         templ = "%3s %-20s %-5s %20s %20s"
         print(templ % (
-            lista[0][d]['isfile'],
-            lista[0][d]['arquivo'][:20],
-            bytes2human(lista[0][d]['tamanho']),
-            lista[0][d]['atime'],
-            lista[0][d]['mtime']))
+            lista[d]['isfile'],
+            lista[d]['arquivo'][:20],
+            bytes2human(lista[d]['tamanho']),
+            lista[d]['atime'],
+            lista[d]['mtime']))
     print("\n###### FINAL LISTAGEM ARQUIVOS ######")
+
+
+def processos():
+    request = get_server("PROCESSOS")
+    surface = pygame.Surface(TAM_TELA)
+    surface.fill(CINZA)
+    terminal_processos(request[0])
+    titulo = FONTE_TITLE.render("PROCESSOS EM EXECUÇÃO", True, ESCURO)
+    surface.blit(titulo, (40, 20))
+    subtitulo = FONTE_TITLE.render(f"Encontrados {len(request[0])} processos no servidor .", True, VERDE)
+    surface.blit(subtitulo, (40, 120))
+    info = FONTE_INFO_BOLD.render(f"Os processos do servidor foram listados no terminal.", True, ESCURO)
+    surface.blit(info, (40, 180))
+    TELA.blit(surface, (0, 0))
+    pygame.display.update()
+
+
+def terminal_processos(lista_processos):
+    print("####### LISTAGEM DE PROCESSOS | SERVER #######")
+    templ = "%5s %0s %22s %8s %8s %8s"
+    print(templ % ("PID ", "NOME", "STATUS", "  RSS", "VMS", " MEM TOTAL"))
+    for process in lista_processos:
+        templ = "%5s %-20s %-5s %8s %8s %8s"
+        print(templ % (
+            lista_processos[process]['pid'],
+            process[:20],
+            lista_processos[process]['status'],
+            bytes2human(lista_processos[process]['memrss']),
+            bytes2human(lista_processos[process]['memvms']),
+            bytes2human(lista_processos[process]['memrss']+lista_processos[process]['memvms'])
+        ))
+    print("\n###### FINAL LISTAGEM DE PROCESSOS ######")
 
 # FIM PÁGINAS ##################
 
@@ -354,12 +399,11 @@ def main():
                     if pagina < 12:
                         pagina += 1
                 if event.key == pygame.K_SPACE:
-                    pagina = 11
+                    pagina = 4
         if controle == 60:
             navegacao()
             if pagina == 0 and not printed:
-                #processador()
-                arquivos()
+                processador()
                 printed = True
             if pagina == 1 and printed:
                 memoria_ram_rede()
@@ -370,6 +414,9 @@ def main():
             if pagina == 3 and printed:
                 arquivos()
                 printed = False
+            if pagina == 4 and not printed:
+                processos()
+                printed = True
             controle = 0
         pygame.display.update()
         controle += 1
