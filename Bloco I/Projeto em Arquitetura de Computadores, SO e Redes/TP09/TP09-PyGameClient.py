@@ -452,17 +452,17 @@ def main():
                     if pagina > 0:
                         pagina -= 1
                 if colisao_setas(pos) == 2:
-                    if pagina < 12:
+                    if pagina < 6:
                         pagina += 1
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT:
                     if pagina > 0:
                         pagina -= 1
                 if event.key == pygame.K_RIGHT:
-                    if pagina < 12:
+                    if pagina < 6:
                         pagina += 1
                 if event.key == pygame.K_SPACE:
-                    pagina = 4
+                    pagina = 1
         if controle == 60:
             navegacao()
             if pagina == 0 and not printed:
