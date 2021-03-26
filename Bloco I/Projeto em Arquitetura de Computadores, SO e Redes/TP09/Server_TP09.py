@@ -10,6 +10,7 @@ import netifaces
 import psutil
 from cpuinfo import cpuinfo
 from dateutil.tz import tz
+from psutil._common import bytes2human
 
 socket_servidor = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 host = socket.gethostname()
@@ -150,23 +151,26 @@ def obtem_arquivos(diretorio):
     return dict_files
 
 
+def processos():
+    dict_process = {}
+    for item in psutil.process_iter():
+        dict_process[item.name()] = item.as_dict(attrs=['pid', 'status', 'cpu_times', 'memory_info'])
+    return dict_process
+
+
 executar = True
 while executar:
     (socket_cliente, addr) = socket_servidor.accept()
-    print("Conexão estabelecida com: ", str(addr))
-    mensagem = socket_cliente.recv(2048).decode('ascii')
+    mensagem = socket_cliente.recv(1024).decode('ascii')
+    print(f"{str(addr[0])}:{str(addr[1])} está SOLICITANDO: {mensagem}")
     if mensagem == "CPU":
         dados = json.dumps(processador())
-        socket_cliente.send(str.encode(dados))
     elif mensagem == "MEMORY":
         dados = json.dumps(memoria_ram())
-        socket_cliente.send(str.encode(dados))
     elif mensagem == "DISKS":
         dados = json.dumps(verifica_discos())
-        socket_cliente.send(str.encode(dados))
     elif mensagem == "REDE":
         dados = json.dumps(info_redes())
-        socket_cliente.send(str.encode(dados))
     elif mensagem == "FILES":
         if platform.system() == "Windows":
             xdict = obtem_arquivos("C:"+os.environ['HOMEPATH'])
@@ -175,10 +179,12 @@ while executar:
         else:
             xdict = obtem_arquivos(os.environ['PATH'])
         dados = json.dumps(xdict)
-        socket_cliente.send(str.encode(dados))
+    elif mensagem == "PROCESS":
+        dados = json.dumps(processos())
     else:
         dados = {'conexao': 'ERROR'}
         dados = json.dumps(dados)
-        socket_cliente.send(str.encode(dados))
+    socket_cliente.send(str.encode(dados))
+    print(f"ENVIADOS {bytes2human(dados.__sizeof__())} para {str(addr[0])}:{str(addr[1])}")
 
 # socket_servidor.close()
