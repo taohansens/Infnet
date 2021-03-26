@@ -125,36 +125,20 @@ def timestamp_converter(st_time):
 
 
 def obtem_arquivos(diretorio):
-    class InfoArquivos:
-        def __init__(self, nome, tamanho, atime, mtime, isfile):
-            self.nome = nome
-            self.tamanho = tamanho
-            self.atime = atime
-            self.mtime = mtime
-            self.isfile = isfile
-
-    lista_arquivos = []
+    dict_files = {}
     if os.path.exists(diretorio):
         l_arquivos = os.listdir(diretorio)
         for arquivo in l_arquivos:
             caminho_arquivo = os.path.join(diretorio, arquivo)
             arquivo_stat = os.stat(caminho_arquivo)
-            tamanho = f"{arquivo_stat.st_size // 1024} KB"
-            instFile = InfoArquivos(arquivo,
-                                    tamanho,
-                                    timestamp_converter(os.stat(caminho_arquivo).st_atime),
-                                    timestamp_converter(os.stat(caminho_arquivo).st_mtime),
-                                    os.path.isfile(caminho_arquivo))
-            lista_arquivos.append(instFile)
-    dict_files = {}
-    for arquivo in lista_arquivos:
-        dict_files[arquivo.nome] = {
-            'arquivo': arquivo.nome,
-            'tamanho': arquivo.tamanho,
-            'atime': arquivo.atime,
-            'mtime': arquivo.mtime,
-            'isfile': arquivo.isfile
-        }
+            tamanho = arquivo_stat.st_size
+            dict_files[arquivo] = {
+                'arquivo': arquivo,
+                'tamanho': tamanho,
+                'atime': timestamp_converter(os.stat(caminho_arquivo).st_atime),
+                'mtime': timestamp_converter(os.stat(caminho_arquivo).st_mtime),
+                'isfile': "FIL" if os.path.isfile(caminho_arquivo) else "DIR"
+            }
     return dict_files
 
 

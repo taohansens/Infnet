@@ -1,4 +1,4 @@
-import pickle
+import json
 import socket
 
 import pygame
@@ -41,19 +41,24 @@ TAM_TELA = (LARGURA_TELA, ALTURA_TELA-TAM_EXIBICAO[1])
 
 
 def get_server(solicitacao):
-    # Digite as informações para conexão
-    # host = "52.67.6.168"  # Server instanciado na AWS
     host = socket.gethostname()
     porta = 5000
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    dados = {'conexao': 'ERROR'}
     try:
         s.connect((host, porta))
         s.send(f"{solicitacao}".encode('ascii'))
-        dados = pickle.loads(s.recv(10000))
-        s.close()
+        request = b''
+        while True:
+            data = s.recv(1024)
+            request = request + data
+            try:
+                dados = json.loads(request)
+                break
+            except:
+                continue
         informacoes = [dados, (host, porta)]
     except ConnectionRefusedError as error:
-        dados = {'conexao': 'ERROR'}
         informacoes = [dados, (host, porta)]
         print(error)
     return informacoes
@@ -267,6 +272,59 @@ def discos():
     surface.blit(info6_1, (ALINHAMENTO + 280, 290))
 
     TELA.blit(surface, (0, 0))
+
+
+def arquivos():
+    request = get_server("FILES")
+    # print_arquivos_terminal(request)
+    surface = pygame.Surface(TAM_TELA)
+    surface.fill(CINZA)
+
+    # Posições em pixels
+    pos_altura_barra = 50
+
+    # Textos Info processador
+    # Título
+    titulo = FONTE_TITLE.render(f"Listagem de Arquivos", True, ESCURO)
+    surface.blit(titulo, (40, 20))
+
+    templ = "%3s %0s %22s %25s %20s"
+    header = (templ % ("TIPO", "NOME", "TAMANHO", "DATA MOD", "DATA CRI"))
+
+    header_table = FONTE_SUBINFO_BOLD.render(header, True, ESCURO)
+    surface.blit(header_table, (40, pos_altura_barra + 50))
+
+    # impressão de arquivos
+    distancia_px = 10
+    for d in request[0]:
+        templ = "%3s %-20s %-5s %20s %20s"
+        distancia_px += 20
+        file = templ % (
+            request[0][d]['isfile'],
+            request[0][d]['arquivo'][:15],
+            bytes2human(request[0][d]['tamanho']),
+            request[0][d]['atime'],
+            request[0][d]['mtime'])
+        ls_arquivo = FONTE_INFO.render(file, True, ESCURO)
+        surface.blit(ls_arquivo, (40, 90 + distancia_px))
+
+    TELA.blit(surface, (0, 0))
+
+
+def print_arquivos_terminal(lista):
+    print("####### LISTAGEM DE ARQUIVOS | SERVER #######")
+    templ = "%3s %0s %22s %10s %20s"
+    print(templ % ("TIPO", "NOME", "TAMANHO", "DATA MOD", "DATA CRI"))
+    for d in lista[0]:
+        templ = "%3s %-20s %-5s %20s %20s"
+        print(templ % (
+            lista[0][d]['isfile'],
+            lista[0][d]['arquivo'][:20],
+            bytes2human(lista[0][d]['tamanho']),
+            lista[0][d]['atime'],
+            lista[0][d]['mtime']))
+    print("\n###### FINAL LISTAGEM ARQUIVOS ######")
+
 # FIM PÁGINAS ##################
 
 
@@ -300,7 +358,8 @@ def main():
         if controle == 60:
             navegacao()
             if pagina == 0 and not printed:
-                processador()
+                #processador()
+                arquivos()
                 printed = True
             if pagina == 1 and printed:
                 memoria_ram_rede()
@@ -308,6 +367,9 @@ def main():
             if pagina == 2 and not printed:
                 discos()
                 printed = True
+            if pagina == 3 and printed:
+                arquivos()
+                printed = False
             controle = 0
         pygame.display.update()
         controle += 1
