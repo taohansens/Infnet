@@ -10,6 +10,7 @@ import netifaces
 import psutil
 from cpuinfo import cpuinfo
 from dateutil.tz import tz
+from nmap import nmap
 from psutil._common import bytes2human
 
 socket_servidor = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -165,6 +166,46 @@ def processos():
     return dict_process
 
 
+def ips_nmap():
+    print("INICIANDO SCANNER DE REDE")
+    ip = netifaces.gateways()['default'][2][0]
+    nm = nmap.PortScanner()
+    nm.scan(hosts=ip + "/25", arguments="-F -n")
+    print("FINALIZADO...")
+    ips_up = {}
+    if nm.all_hosts():
+        for host in nm.all_hosts():
+            if nm[host].state() == 'up':
+                try:
+                    ips_up[host] = nm[host]['tcp']
+                except:
+                    ValueError()
+    return ips_up, ip
+
+
+def infor_adapters():
+    list_of_adapters = []
+    for rede in psutil.net_if_addrs():
+        list_of_adapters.append(rede)
+    dados = {}
+    for adapter in list_of_adapters:
+        for snicaddr in psutil.net_if_addrs().get(adapter):
+            if snicaddr.family == socket.AF_INET:
+                ipv4 = snicaddr.address
+                netmask = snicaddr.netmask
+            elif snicaddr.family == socket.AF_INET6:
+                ipv6 = snicaddr.address
+                if snicaddr.address is None:
+                    ipv6 = "-"
+                if snicaddr.netmask is not None:
+                    netmask = snicaddr.netmask
+            else:
+                ipv4 = None
+                ipv6 = None
+        dados[adapter] = {'ip': ipv4, 'ip6': ipv6, 'netmask': netmask}
+    return dados
+
+
 executar = True
 total = 0
 while executar:
@@ -173,12 +214,16 @@ while executar:
     print(f"{str(addr[0])}:{str(addr[1])} está SOLICITANDO: {mensagem}")
     if mensagem == "CPU":
         dados = json.dumps(processador())
+
     elif mensagem == "MEMORY":
         dados = json.dumps(memoria_ram())
+
     elif mensagem == "DISKS":
         dados = json.dumps(verifica_discos())
+
     elif mensagem == "REDE":
         dados = json.dumps(info_redes())
+
     elif mensagem == "FILES":
         if platform.system() == "Windows":
             xdict = obtem_arquivos("C:"+os.environ['HOMEPATH'])
@@ -187,8 +232,12 @@ while executar:
         else:
             xdict = obtem_arquivos(os.environ['PATH'])
         dados = json.dumps(xdict)
+
     elif mensagem == "PROCESSOS":
         dados = json.dumps(processos())
+
+    elif mensagem == "NMAP_SCAN":
+        dados = json.dumps(ips_nmap())
     else:
         print("MENSAGEM NÃO RECONHECIDA. ENVIANDO ERROR.")
         dados = {'conexao': 'ERROR'}
