@@ -168,7 +168,12 @@ while executar:
         dados = json.dumps(info_redes())
         socket_cliente.send(str.encode(dados))
     elif mensagem == "FILES":
-        xdict = obtem_arquivos("C:"+os.environ['HOMEPATH'])
+        if platform.system() == "Windows":
+            xdict = obtem_arquivos("C:"+os.environ['HOMEPATH'])
+        if platform.system() == "Linux":
+            xdict = obtem_arquivos('/')
+        else:
+            xdict = obtem_arquivos(os.environ['PATH'])
         dados = json.dumps(xdict)
         socket_cliente.send(str.encode(dados))
     else:
