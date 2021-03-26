@@ -370,6 +370,69 @@ def terminal_processos(lista_processos):
         ))
     print("\n###### FINAL LISTAGEM DE PROCESSOS ######")
 
+
+def network_nmap():
+    print("#### AGUARDANDO RESPOSTA DO SERVIDOR.... ")
+    request = get_server("NMAP_SCAN")[0]
+    surface = pygame.Surface(TAM_TELA)
+    surface.fill(CINZA)
+    titulo = FONTE_TITLE.render(f"Nmap Scanner | SERVER", True, ESCURO)
+    surface.blit(titulo, (40, 20))
+    qtd_ips = len(request[0])
+    info = FONTE_INFO_BOLD.render(f"{qtd_ips} IP(s) localizado(s) na busca.", True, ESCURO)
+    info2 = FONTE_INFO_BOLD.render(f"<<< Outros hosts e portas exibidos no console >>>", True, ESCURO)
+    surface.blit(info, (40, 80))
+    surface.blit(info2, (40, 100))
+
+    y = 180
+    x = 200
+    title_ip = FONTE_SUBINFO_BOLD.render(f"IP UTILIZADO NA BUSCA", True, ESCURO)
+    surface.blit(title_ip, (x, y - 20))
+
+    print("\n#### LISTANDO HOSTS ENCONTRADOS E PORTAS ####")
+    for host in request[0]:
+        print("IP: ", host)
+        for port in request[0][host]:
+            print(f"{port} - {request[0][host][port]['state']} - {request[0][host][port]['name']}")
+        print("=========")
+    print("\n#### FIM HOSTS ####")
+
+    if request[1] in request[0]:
+        ip_localizado = FONTE_TITLE.render(f"{request[1]}", True, AZUL)
+        surface.blit(ip_localizado, (x, y))
+        y += 80
+        title_ports = FONTE_SUBINFO_BOLD.render(f"PORTA | STATUS | NOME", True, VERMELHO)
+        surface.blit(title_ports, (x, y - 20))
+        for port in request[0][request[1]]:
+            info_ip = FONTE_INFO_BOLD.render(
+                f"{port} - {request[0][request[1]][port]['state']} - {request[0][request[1]][port]['name']}", True, ESCURO)
+            surface.blit(info_ip, (x, y))
+            y += 20
+
+    TELA.blit(surface, (0, 0))
+
+
+def inf_adapters():
+    request = get_server("INF_ADAPTERS")[0]
+    surface = pygame.Surface(TAM_TELA)
+    surface.fill(CINZA)
+    titulo = FONTE_TITLE.render(f"ADAPTADORES DE REDE", True, ESCURO)
+    surface.blit(titulo, (40, 20))
+    qtd_adapt = len(request)
+    info = FONTE_TITLE.render(f"{qtd_adapt} interface(s) de rede localizada(s).", True, VERDE)
+    title_info = FONTE_INFO_BOLD.render(f"Listagem de interfaces no console.", True, ESCURO)
+    surface.blit(title_info, (40, 150))
+    surface.blit(info, (40, 180))
+    TELA.blit(surface, (0, 0))
+
+    print("\n#### LISTANDO ADAPTADORES ENCONTRADOS ####")
+    for adapter in request.keys():
+        print("="*20)
+        print(adapter)
+        print(f"IP: {request[adapter]['ip']}")
+        print(f"IP6 : {request[adapter]['ip6']}")
+        print(f"Máscara de Rede : {request[adapter]['netmask']}")
+    print("\n#### FIM ADAPTADORES ####")
 # FIM PÁGINAS ##################
 
 
@@ -416,6 +479,12 @@ def main():
                 printed = False
             if pagina == 4 and not printed:
                 processos()
+                printed = True
+            if pagina == 5 and printed:
+                network_nmap()
+                printed = False
+            if pagina == 6 and not printed:
+                inf_adapters()
                 printed = True
             controle = 0
         pygame.display.update()

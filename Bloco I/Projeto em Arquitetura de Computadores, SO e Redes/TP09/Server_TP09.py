@@ -238,6 +238,10 @@ while executar:
 
     elif mensagem == "NMAP_SCAN":
         dados = json.dumps(ips_nmap())
+
+    elif mensagem == "INF_ADAPTERS":
+        dados = json.dumps(infor_adapters())
+
     else:
         print("MENSAGEM NÃO RECONHECIDA. ENVIANDO ERROR.")
         dados = {'conexao': 'ERROR'}
