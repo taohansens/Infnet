@@ -2,10 +2,11 @@ import pprint
 import threading
 import time
 from random import randint
+from multiprocessing import Pool
 import matplotlib.pyplot as plt
 
 TEMPOS = {"SEQUENCIAL": {},
-          "CONCORRENTE": {},
+          "THREADING": {},
           "MULTI": {}}
 
 
@@ -41,14 +42,14 @@ def sequencial():
                 B.append(factorial(item))
             fim = float(time.time())
             tempo = round(fim - inicio,5)
-            print_format("SEQUENCIAL", qtd_numero, execucao, tempo)
+            # print_format("SEQUENCIAL", qtd_numero, execucao, tempo)
             TEMPOS["SEQUENCIAL"][qtd_numero].append(tempo)
             execucao += 1
 
 
-def concorrente():
+def threadg():
     for qtd_numero in [200000, 500000, 1000000]:
-        TEMPOS["CONCORRENTE"][qtd_numero] = []
+        TEMPOS["THREADING"][qtd_numero] = []
         execucao = 0
         while execucao < 5:
 
@@ -58,7 +59,7 @@ def concorrente():
             threads = 4
             inicio = float(time.time())
             for i in range(qtd_numero):
-                A.append(randint(1, 20))
+                A.append(randint(1, 10))
 
             for i in range(threads):
                 start_t = i * int(qtd_numero / threads)
@@ -71,11 +72,35 @@ def concorrente():
                 th.join()
             fim = float(time.time())
             tempo = round(fim - inicio, 5)
-            TEMPOS["CONCORRENTE"][qtd_numero].append(tempo)
-            print_format("CONCORRENTE", qtd_numero, execucao, tempo)
+            TEMPOS["THREADING"][qtd_numero].append(tempo)
+            # print_format("THREADING", qtd_numero, execucao, tempo)
             execucao += 1
 
 
+def main():
+    for qtd_numero in [200000, 500000, 1000000]:
+        TEMPOS["MULTI"][qtd_numero] = []
+        execucao = 0
+        while execucao < 5:
+            inicio = float(time.time())
+            with Pool(processes=4) as pool:
+                A = []
+                for i in range(qtd_numero):
+                    A.append(randint(1, 10))
+
+                B = []
+                for i in A:
+                    B.append(factorial(i))
+            fim = float(time.time())
+            tempo = round(fim - inicio, 5)
+            TEMPOS["MULTI"][qtd_numero].append(tempo)
+            # print_format("MULTI", qtd_numero, execucao, tempo)
+            execucao += 1
+
+
+if __name__ == "__main__":
+    main()
+
 sequencial()
-concorrente()
+threadg()
 pprint.pprint(TEMPOS)
