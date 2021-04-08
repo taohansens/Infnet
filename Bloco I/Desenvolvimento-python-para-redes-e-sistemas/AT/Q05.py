@@ -3,7 +3,6 @@ def transforma_arquivos(arquivo1, arquivo2):
     numeros1 = textfile1.read().split(' ')
     textfile2 = open(arquivo2, "r", encoding="utf-8")
     numeros2 = textfile2.read().split(' ')
-    print(len(numeros1), len(numeros2))
     if len(numeros1) < len(numeros2):
         qtd = len(numeros2) - len(numeros1)
         for i in range(qtd):
