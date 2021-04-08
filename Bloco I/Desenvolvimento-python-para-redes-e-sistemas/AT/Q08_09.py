@@ -9,8 +9,7 @@ TEMPOS = {"SEQUENCIAL": {},
           "THREADING": {},
           "MULTI": {}}
 
-
-numeros = [100000, 200000, 300000]
+numeros = [500000, 1000000, 2000000]
 
 
 def factorial(n):
@@ -28,13 +27,13 @@ def calc_fact(lis_en, start_t, end_t, lis_s):
 def print_format(tipo, num, exec, time):
     if exec == 0:
         print(f"=== EXECUÇÃO {tipo}: {num} ===")
-    print(f"EXEC {exec+1}: {time} segundos.")
+    print(f"EXEC {exec + 1}: {time} segundos.")
 
 
 def cria_plot(tempos):
     for num in numeros:
         plt.title(f"N = {num} Factorials")
-        qtd = [n for n in range(1, len(tempos["MULTI"][num])+1)]
+        qtd = [n for n in range(1, len(tempos["MULTI"][num]) + 1)]
         plt.plot(qtd, tempos["MULTI"][num], 'b', label='Multiprocessing', linewidth=3.0)
         plt.plot(qtd, tempos["THREADING"][num], 'g', label='Threading', linewidth=3.0)
         plt.plot(qtd, tempos["SEQUENCIAL"][num], 'r', label='Sequencial', linewidth=3.0)
@@ -60,7 +59,7 @@ def sequencial():
             for item in A:
                 B.append(factorial(item))
             fim = float(time.time())
-            tempo = round(fim - inicio,5)
+            tempo = round(fim - inicio, 5)
             # print_format("SEQUENCIAL", qtd_numero, execucao, tempo)
             TEMPOS["SEQUENCIAL"][qtd_numero].append(tempo)
             execucao += 1
