@@ -74,7 +74,7 @@ def threadg():
             A = []
             B = []
             T = []
-            threads = 12
+            threads = 4
             for i in range(qtd_numero):
                 A.append(randint(1, 10))
 
@@ -100,7 +100,7 @@ def main():
         execucao = 0
         while execucao < 5:
             inicio = float(time.time())
-            with Pool(processes=12) as pool:
+            with Pool(processes=4) as pool:
                 A = []
                 for i in range(qtd_numero):
                     A.append(randint(1, 10))
