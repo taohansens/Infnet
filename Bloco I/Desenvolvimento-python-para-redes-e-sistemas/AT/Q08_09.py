@@ -10,6 +10,9 @@ TEMPOS = {"SEQUENCIAL": {},
           "MULTI": {}}
 
 
+numeros = [100000, 200000, 300000]
+
+
 def factorial(n):
     factorial = n
     for i in range(n - 1, 1, -1):
@@ -28,8 +31,24 @@ def print_format(tipo, num, exec, time):
     print(f"EXEC {exec+1}: {time} segundos.")
 
 
+def cria_plot(tempos):
+    for num in numeros:
+        plt.title(f"N = {num} Factorials")
+        qtd = [n for n in range(1, len(tempos["MULTI"][num])+1)]
+        plt.plot(qtd, tempos["MULTI"][num], 'b', label='Multiprocessing', linewidth=3.0)
+        plt.plot(qtd, tempos["THREADING"][num], 'g', label='Threading', linewidth=3.0)
+        plt.plot(qtd, tempos["SEQUENCIAL"][num], 'r', label='Sequencial', linewidth=3.0)
+        plt.legend()
+        plt.xlim(1, 5)
+        plt.xlabel('Execução')
+        plt.ylabel('Tempo (s)')
+        plt.grid(True)
+        plt.xticks(qtd)
+        plt.show()
+
+
 def sequencial():
-    for qtd_numero in [200000, 500000, 1000000]:
+    for qtd_numero in numeros:
         execucao = 0
         TEMPOS["SEQUENCIAL"][qtd_numero] = []
         while execucao < 5:
@@ -48,16 +67,15 @@ def sequencial():
 
 
 def threadg():
-    for qtd_numero in [200000, 500000, 1000000]:
+    for qtd_numero in numeros:
         TEMPOS["THREADING"][qtd_numero] = []
         execucao = 0
         while execucao < 5:
-
+            inicio = float(time.time())
             A = []
             B = []
             T = []
-            threads = 4
-            inicio = float(time.time())
+            threads = 12
             for i in range(qtd_numero):
                 A.append(randint(1, 10))
 
@@ -78,12 +96,12 @@ def threadg():
 
 
 def main():
-    for qtd_numero in [200000, 500000, 1000000]:
+    for qtd_numero in numeros:
         TEMPOS["MULTI"][qtd_numero] = []
         execucao = 0
         while execucao < 5:
             inicio = float(time.time())
-            with Pool(processes=4) as pool:
+            with Pool(processes=12) as pool:
                 A = []
                 for i in range(qtd_numero):
                     A.append(randint(1, 10))
@@ -103,4 +121,6 @@ if __name__ == "__main__":
 
 sequencial()
 threadg()
+
 pprint.pprint(TEMPOS)
+cria_plot(TEMPOS)
