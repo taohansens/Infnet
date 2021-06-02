@@ -72,31 +72,60 @@ namespace Aula08Crud.Controllers {
 
         // GET: AutorController/Edit/5
         public ActionResult Edit(int id) {
-            return View();
+            var autorModel = Autores.FirstOrDefault(x => x.Id == id);
+
+            if (autorModel != null) {
+                return View(autorModel);
+            }
+            else {
+                return RedirectToAction(nameof(Index));
+            }
         }
 
         // POST: AutorController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection) {
+        public ActionResult Edit(int id, AutorModel autorModel) {
             try {
-                return RedirectToAction(nameof(Index));
+                var autor = Autores.FirstOrDefault(x => x.Id == id);
+                EditAutor(autor, autorModel);
+
+                return RedirectToAction(nameof(Details), new { id = autor.Id });
             }
             catch {
                 return View();
             }
         }
 
+        public AutorModel EditAutor(AutorModel autor, AutorModel autorEdit) {
+            autor.Id = autorEdit.Id;
+            autor.Nome = autorEdit.Nome;
+            autor.UltimoNome = autorEdit.UltimoNome;
+            autor.Nacionalidade = autorEdit.Nacionalidade;
+            autor.QuantidadeLivrosPublicados = autorEdit.QuantidadeLivrosPublicados;
+            return autor;
+
+        }
+
         // GET: AutorController/Delete/5
         public ActionResult Delete(int id) {
-            return View();
+            var autorModel = Autores.FirstOrDefault(x => x.Id == id);
+
+            if (autorModel != null) {
+                return View(autorModel);
+            }
+            else {
+                return RedirectToAction(nameof(Index));
+            }
         }
 
         // POST: AutorController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection) {
+        public ActionResult Delete(AutorModel autorModel) {
             try {
+                var autor = Autores.FirstOrDefault(x => x.Id == autorModel.Id);
+                Autores.Remove(autor);
                 return RedirectToAction(nameof(Index));
             }
             catch {
