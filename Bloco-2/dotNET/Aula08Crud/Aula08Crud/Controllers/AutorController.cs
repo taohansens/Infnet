@@ -29,19 +29,27 @@ namespace Aula08Crud.Controllers {
 
         // GET: AutorController
         public ActionResult Index() {
-
-
-
-
-
-
-
             return View(Autores);
         }
 
         // GET: AutorController/Details/5
         public ActionResult Details(int id) {
-            return View();
+            var autorModel = Autores.FirstOrDefault(x => x.Id == id);
+            
+ //           foreach (var autor in Autores) {
+ //               if (autor.Id == id) {
+ //                   return View(autor);
+ //               } else {
+ //                   return RedirectToAction(nameof(Index));
+ //               }
+ //           }
+            
+            if (autorModel != null) {
+                return View(autorModel);
+            }
+            else {
+                return RedirectToAction(nameof(Index));
+            }
         }
 
         // GET: AutorController/Create
