@@ -25,7 +25,7 @@ namespace Infrastructure.Data.Repositories {
         };
 
         public AutorModel Create(AutorModel autorModel) {
-            autorModel.Id = GetAll().Count() + 1;
+            autorModel.Id = GetAll(null).Count() + 1;
             Autores.Add(autorModel);
             return autorModel;
         }
@@ -53,8 +53,14 @@ namespace Infrastructure.Data.Repositories {
 
         }
 
-        public IEnumerable<AutorModel> GetAll() {
-            return Autores;
+        public IEnumerable<AutorModel> GetAll(string search) {
+            if (search == null) {
+                return Autores;
+            } else {
+                return Autores.Where(x =>
+                    x.Nome.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                    x.UltimoNome.Contains(search, StringComparison.OrdinalIgnoreCase));
+            }
         }
 
         public AutorModel GetById(int id) {

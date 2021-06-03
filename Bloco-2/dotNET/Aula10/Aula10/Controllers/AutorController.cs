@@ -12,8 +12,9 @@ namespace Aula10Crud.Controllers {
         }
 
         // GET: AutorController
-        public ActionResult Index() {
-            var autores = _autorRepository.GetAll();
+        public ActionResult Index(string search = null ) {
+            var autores = _autorRepository.GetAll(search);
+            ViewData["Search"] = search;
             return View(autores);
         }
 

@@ -4,7 +4,11 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<h1>Search</h1>
+<form asp-action="Index">
+    <input type="text" value="@ViewData["Search"]" name="search"/>
+    <button>Go!</button>
+</form>
 
 <p>
     <a asp-action="Create">Create New</a>
