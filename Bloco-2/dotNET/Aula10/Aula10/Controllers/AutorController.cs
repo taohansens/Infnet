@@ -1,15 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Infrastructure.Data;
 using Infrastructure.Data.Repositories;
-using Infrastructure.Data;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Aula10Crud.Controllers {
 
-     public class AutorController : Controller {
+    public class AutorController : Controller {
         private readonly AutorInMemoryRepository _autorRepository;
 
         public AutorController() {
@@ -18,7 +13,8 @@ namespace Aula10Crud.Controllers {
 
         // GET: AutorController
         public ActionResult Index() {
-            return View();
+            var autores = _autorRepository.GetAll();
+            return View(autores);
         }
 
         // GET: AutorController/Details/5

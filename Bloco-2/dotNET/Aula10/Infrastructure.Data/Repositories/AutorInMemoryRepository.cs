@@ -25,6 +25,7 @@ namespace Infrastructure.Data.Repositories {
         };
 
         public AutorModel Create(AutorModel autorModel) {
+            autorModel.Id = GetAll().Count() + 1;
             Autores.Add(autorModel);
             return autorModel;
         }
