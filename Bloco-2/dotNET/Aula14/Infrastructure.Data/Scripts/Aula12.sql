@@ -24,3 +24,8 @@ UPDATE Autor
 	WHERE Id = 2;
 
 DELETE FROM Autor WHERE Id = 2;
+
+UPDATE Autor
+SET Nome = 'taoe', UltimoNome = 'taoe', Nacionalidade = 'taoe', 
+    QuantidadeLivrosPublicados = 1, Nascimento = '1996-01-31'
+	WHERE Id = 1;

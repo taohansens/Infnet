@@ -5,10 +5,10 @@ using Microsoft.AspNetCore.Mvc;
 namespace Aula10Crud.Controllers {
 
     public class AutorController : Controller {
-        private readonly AutorInMemoryRepository _autorRepository;
+        private readonly AutorSqlServerRepository _autorRepository;
 
         public AutorController() {
-            _autorRepository = new AutorInMemoryRepository();
+            _autorRepository = new AutorSqlServerRepository();
         }
 
         // GET: AutorController
@@ -96,7 +96,7 @@ namespace Aula10Crud.Controllers {
                 return RedirectToAction(nameof(Index));
             }
             catch {
-                return View();
+                return View(nameof(Delete));
             }
         }
     }
