@@ -1,26 +1,23 @@
-﻿CREATE TABLE Autor(
+﻿SELECT * FROM Autor;
+
+CREATE TABLE Livro(
 	Id INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
-	Nome NVARCHAR(50),
-	UltimoNome NVARCHAR(50),
-	Nacionalidade NVARCHAR(50),
-	QuantidadeLivrosPublicados INT,
-	Nascimento DATETIME2,
+	Nome NVARCHAR(50) NOT NULL,
+	AutorId INT NOT NULL FOREIGN KEY REFERENCES Autor(Id)
 );
 
-DROP TABLE Autor;
+DROP TABLE Livro;
 
-SELECT * FROM Autor;
+SELECT * FROM Livro;
 
-INSERT INTO Autor
-	(Nome, UltimoNome, Nacionalidade, QuantidadeLivrosPublicados, Nascimento)
-	VALUES('Tao', 'Hansen', 'Brasileiro', 5, '1996-01-31');
+INSERT INTO Livro
+	(Nome, AutorId)
+	VALUES('O despertar do amanhã', 1);
 
-INSERT INTO Autor
-(Nome, UltimoNome, Nacionalidade, QuantidadeLivrosPublicados, Nascimento)
-VALUES('Tao', 'Hansen', 'Brasileiro', 5, '1996-01-31');
+SELECT * FROM Livro
+	INNER JOIN Autor
+	ON Livro.AutorId = Autor.Id;
 
-UPDATE Autor
-	SET UltimoNome = 'Alterado'
-	WHERE Id = 2;
-
-DELETE FROM Autor WHERE Id = 2;
+SELECT Livro.Nome, Autor.Nome, Autor.UltimoNome FROM Livro
+	INNER JOIN Autor
+	ON Livro.AutorId = Autor.Id;
