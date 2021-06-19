@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Infrastructure.Data.Models;
+using System.Collections.Generic;
 
 namespace Infrastructure.Data.Repositories {
     interface IAutorRepository {

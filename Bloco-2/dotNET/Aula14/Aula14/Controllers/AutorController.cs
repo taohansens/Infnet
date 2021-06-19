@@ -1,4 +1,4 @@
-﻿using Infrastructure.Data;
+﻿using Infrastructure.Data.Models;
 using Infrastructure.Data.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
